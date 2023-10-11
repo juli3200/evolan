@@ -1,11 +1,17 @@
 pub mod objects;
+pub mod neurons;
 
-const GENOME_LENGTH: usize = 16;
-type Dow = u8;
+// lenght of genomes
+pub const GENOME_LENGTH: usize = 16;
+
+// Dimension_of_world; type of dimension val; if it is higher than 255 change to u16
+pub type Dow = u8;
 
 // trait for all Objects
-trait ObjectTrait{
+pub trait ObjectTrait{
+    // pos fn for every object
     fn pos(&self)->(Dow, Dow);
+    fn spawn(& mut self, world: &World);
 }
 
 impl std::fmt::Debug for dyn ObjectTrait{
@@ -13,6 +19,7 @@ impl std::fmt::Debug for dyn ObjectTrait{
         write!(f, "{:?}", self.pos())
     }
 }
+
 
 
 #[derive(Debug)]
@@ -33,3 +40,40 @@ pub struct World{
 
 }
 
+impl World{
+    pub fn new(dim: (Dow, Dow), n_of_bots: u16, barrier_blocks_pos: Vec<(Dow, Dow)>) {
+        {
+            // all variables get out of scope 
+            let n_of_bots_usize: usize = n_of_bots as usize;
+            // checking input
+            if dim.0 == Dow::MAX || dim.1 == Dow::MAX{panic!("dim.0/dim.1 must be smaller than Dow::Max; buffer needed")}
+            if dim.0 as usize * (dim.1 as usize) < (n_of_bots_usize+barrier_blocks_pos.len()){
+                panic!("number of objects must be smaller than dim.0*dim.1")}
+        }
+
+        // barrier_blocks_pos is a vector of every barrier_block
+        /////////
+        /// 
+        /// 
+        /// create vectors
+        /// 
+        /// 
+        /// 
+        let mut bot_vec: Vec<objects::Bot> = vec![];
+        for i in 0..n_of_bots{
+            
+        }
+
+        let mut barrier_block_vec: Vec<objects::BarrierBlock>= vec![];
+        
+
+        /* 
+        World { dim: dim, 
+                n_of_bots: n_of_bots, 
+                n_of_barrier_blocks: barrier_blocks_pos.len() as u16, 
+                bot_vec: bot_vec, 
+                barrier_block_vec: (), 
+                grid: () }
+        */
+    }
+}
