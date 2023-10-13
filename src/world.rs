@@ -3,6 +3,9 @@ pub mod neurons;
 
 // lenght of genomes
 pub const GENOME_LENGTH: usize = 16;
+pub const INNER_LAYERS: usize = 1;
+pub const INNER_NEURONS: usize = 2; // inner neurons per inner layer
+
 
 // Dimension_of_world; type of dimension val; if it is higher than 255 change to u16
 pub type Dow = u8;
@@ -52,18 +55,10 @@ impl World{
         }
 
         // barrier_blocks_pos is a vector of every barrier_block
-        /////////
-        /// 
-        /// 
-        /// create vectors
-        /// 
-        /// 
-        /// 
         let mut bot_vec: Vec<objects::Bot> = vec![];
         for i in 0..n_of_bots{
-            
+            bot_vec.push(objects::Bot::new(neurons::create_genome()));
         }
-
         let mut barrier_block_vec: Vec<objects::BarrierBlock>= vec![];
         
 
