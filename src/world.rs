@@ -3,9 +3,8 @@ pub mod neurons;
 
 // lenght of genomes
 pub const GENOME_LENGTH: usize = 16;
-pub const INNER_LAYERS: usize = 1;
+pub const INNER_LAYERS: usize = 1; // max val 3; because of gene generation (more bites assigned to the index bits)
 pub const INNER_NEURONS: usize = 2; // inner neurons per inner layer
-
 
 // Dimension_of_world; type of dimension val; if it is higher than 255 change to u16
 pub type Dow = u8;
@@ -14,7 +13,6 @@ pub type Dow = u8;
 pub trait ObjectTrait{
     // pos fn for every object
     fn pos(&self)->(Dow, Dow);
-    fn spawn(& mut self, world: &World);
 }
 
 impl std::fmt::Debug for dyn ObjectTrait{
@@ -38,13 +36,13 @@ pub struct World{
     bot_vec: Vec<objects::Bot>,
     barrier_block_vec: Vec<objects::BarrierBlock>,
 
-    // grid with pointer to objects
-    grid: Vec<Box<dyn ObjectTrait>>
+    // grid with coordinates of object
+    grid: Vec<Vec<objects::Block>>
 
 }
 
 impl World{
-    pub fn new(dim: (Dow, Dow), n_of_bots: u16, barrier_blocks_pos: Vec<(Dow, Dow)>) {
+    pub fn new(dim: (Dow, Dow), n_of_bots: u16, barrier_blocks_pos: Vec<(Dow, Dow)>) -> Self {
         {
             // all variables get out of scope 
             let n_of_bots_usize: usize = n_of_bots as usize;
@@ -60,15 +58,23 @@ impl World{
             bot_vec.push(objects::Bot::new(neurons::create_genome()));
         }
         let mut barrier_block_vec: Vec<objects::BarrierBlock>= vec![];
-        
+        // here barrier blocks can be added
 
-        /* 
-        World { dim: dim, 
-                n_of_bots: n_of_bots, 
-                n_of_barrier_blocks: barrier_blocks_pos.len() as u16, 
-                bot_vec: bot_vec, 
-                barrier_block_vec: (), 
-                grid: () }
-        */
+        let mut grid = Vec::new();
+        for y in 0..dim.1{
+            let mut row = Vec::new();
+            for x in 0..dim.0{
+                row.push(objects::Block::new(x, y));
+            }
+            grid.push(row);
+        }
+
+        World { dim,
+                n_of_bots,
+                n_of_barrier_blocks: barrier_blocks_pos.len() as u16,
+                bot_vec,
+                barrier_block_vec,
+                grid}
+
     }
 }

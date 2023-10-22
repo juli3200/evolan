@@ -7,15 +7,14 @@ type WorldType = super::World;
 // impl of ObjectTrait for every Object
 impl ObjectTrait for Bot{
     fn pos(&self)->(super::Dow, super::Dow) {(self.x, self.y)}
-    fn spawn(& mut self, world: &super::World)-> (){}
 }
 impl ObjectTrait for BarrierBlock{
     fn pos(&self)->(super::Dow, super::Dow) {(self.x, self.y)}
-    fn spawn(& mut self, world: &super::World) {
-        
-    }
-
 }
+impl ObjectTrait for Block {
+    fn pos(&self)->(super::Dow, super::Dow) {(self.x, self.y)}
+}
+
 
 // Bot 
 #[derive(Debug, Clone)]
@@ -53,9 +52,9 @@ impl Bot {
     // the genome is provided using the 
     pub fn inherit(parents: (Bot, Bot)) -> (){}
 
-    // the spawn function is declared in the trait objects
     // the spawn function adds further information(coordinates) & is called after the World::new() in the World::spawn
-
+    // for the spawn function either the new or the inherit function have already had to be called 
+    pub fn spawn(& mut self, world: &super::World)-> (){}
 
 }
 
@@ -75,5 +74,27 @@ pub struct BarrierBlock{    /*
 impl BarrierBlock{
     fn new(){
 
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct Block{
+    // this block contains information about the guest of the block
+    // e.g a bot han be a guest in the Block
+
+    guest: Option<[usize; 2]>,
+
+    // coordinates; i32
+    x: super::Dow,
+    y: super::Dow
+
+    // more can be added later
+
+}
+
+
+impl Block{
+    pub fn new(x: super::Dow, y: super::Dow)-> Self{
+        Block {guest: None, x: x, y: y }
     }
 }
