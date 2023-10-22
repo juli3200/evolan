@@ -1,5 +1,8 @@
 #![allow(dead_code)]
 
+use std::env::consts::FAMILY;
+
+use rand::Rng;
 use super::ObjectTrait;
 
 type WorldType = super::World;
@@ -50,7 +53,54 @@ impl Bot {
 
     // with the inherit function it's not neccesary to call the new function
     // the genome is provided using the 
-    pub fn inherit(parents: (Bot, Bot)) -> (){}
+    pub fn inherit(parents: (Bot, Bot)) -> (){
+        let mut rng = rand::thread_rng();
+
+        // create a genome with zeros
+        let mut genome: [u32; super::GENOME_LENGTH] = [0u32; super::GENOME_LENGTH];
+        
+        // filling raw genome with random value of parents
+        let mut c = 0; // couter c
+        for gene in genome.iter_mut(){
+            match rng.gen_bool(0.5){
+                true=> *gene = parents.0.genome[c as usize],
+                false => *gene = parents.1.genome[c as usize],
+            }
+            c+= 1
+        }
+
+        if super::MUTATION_ENABLED{
+            // mutation
+            for gene in genome.iter_mut(){
+                
+                let mut hex_gene: Vec<char> = format!("{:X}", gene).chars().collect(); // convert u32 in hex string
+
+                // go through every letter and change it by chance
+                let mut c = 0;
+                for letter in hex_gene.iter_mut(){
+                    match rng.gen_bool(super::MUTATION_RATE) { 
+                        // if mutation occurs, the loop searches for a new random valid gene 
+                        // the validaty is checked with the neurons::valid_gene fn
+                        // if valid the new_letter is assigned to the *letter
+                        true => *letter =   
+                            loop{let new_letter = std::char::from_u32(rng.gen_range(0..16u32)).unwrap();
+                                // the new_gene is a copy of the gene
+                                let mut new_gene = hex_gene.clone();
+                                new_gene[c] = new_letter; // the new letter is changed and checked
+                                match super::neurons::valid_gene(new_gene){
+                                    true=>break new_letter,
+                                    false=> continue
+                                }
+                            }, 
+                        false => {}
+                    }
+                    c+=1;
+                }
+            }
+        }
+
+
+    }
 
     // the spawn function adds further information(coordinates) & is called after the World::new() in the World::spawn
     // for the spawn function either the new or the inherit function have already had to be called 
@@ -72,8 +122,8 @@ pub struct BarrierBlock{    /*
 
 
 impl BarrierBlock{
-    fn new(){
-
+    pub fn new(x:super::Dow, y:super::Dow)-> Self{
+        BarrierBlock{x, y}
     }
 }
 

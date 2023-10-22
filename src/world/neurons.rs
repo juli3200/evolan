@@ -57,6 +57,7 @@ fn create_gene(lib: &Vec<&usize>) -> u32{
 
 
 pub fn create_genome() -> [u32; super::GENOME_LENGTH]{
+    // the neuron lib is a library whitch is used for the creation of the genes
     let mut neuron_lib: Vec<&usize> = Vec::new();
     neuron_lib.push(&(INPUT_NEURONS as usize));
 
@@ -73,5 +74,26 @@ pub fn create_genome() -> [u32; super::GENOME_LENGTH]{
     let gene = gene;
     gene
 }
+
+
+pub fn valid_gene(gene: Vec<char>)-> bool{
+    ///
+    ///
+    /// 
+    /// 
+    /// 
+    /// 
+    /// 
+    /// todo: check if gene is valid 
+    /// used in objects::inherit (mutation)
+    /// create possibility to disable mixed genes from two parents(one parent/clone)
+    /// next create spawn function
+    /// 
+    /// 
+    /// 
+    /// 
+    /// 
+}
+
 
 
