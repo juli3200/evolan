@@ -39,7 +39,9 @@ pub struct World{
     barrier_block_vec: Vec<objects::BarrierBlock>,
 
     // grid with coordinates of object
-    grid: Vec<Vec<objects::Block>>
+    grid: Vec<Vec<objects::Block>>,
+
+    neuron_lib: Vec<&'static usize>
 
 }
 
@@ -54,14 +56,26 @@ impl World{
                 panic!("number of objects must be smaller than dim.0*dim.1")}
         }
 
-        // barrier_blocks_pos is a vector of every barrier_block
-        let mut bot_vec: Vec<objects::Bot> = vec![];
-        for i in 0..n_of_bots{
-            bot_vec.push(objects::Bot::new(neurons::create_genome()));
-        }
-        let mut barrier_block_vec: Vec<objects::BarrierBlock>= vec![];
-        // here barrier blocks can be added
+        // the neuron lib is a library whitch is used for the creation of the genes
+            let mut neuron_lib: Vec<&usize> = Vec::new();
+            neuron_lib.push(&(neurons::INPUT_NEURONS as usize));
 
+            for _ in 0..INNER_LAYERS{
+                neuron_lib.push(&INNER_NEURONS);
+            }
+            neuron_lib.push(&(neurons::OUTPUT_NEURONS as usize));
+        //
+
+        // barrier_blocks_pos is a vector of every barrier_block
+            let mut bot_vec: Vec<objects::Bot> = vec![];
+            for i in 0..n_of_bots{
+                bot_vec.push(objects::Bot::new(neurons::create_genome(&neuron_lib)));
+            }
+            let mut barrier_block_vec: Vec<objects::BarrierBlock>= vec![];
+            // here barrier blocks can be added
+        //
+
+        // the grid is a 2d vec with Blocks in it
         let mut grid = Vec::new();
         for y in 0..dim.1{
             let mut row = Vec::new();
@@ -76,7 +90,8 @@ impl World{
                 n_of_barrier_blocks: barrier_blocks_pos.len() as u16,
                 bot_vec,
                 barrier_block_vec,
-                grid}
+                grid,
+                neuron_lib}
 
     }
 }

@@ -53,7 +53,7 @@ impl Bot {
 
     // with the inherit function it's not neccesary to call the new function
     // the genome is provided using the 
-    pub fn inherit(parents: (Bot, Bot)) -> (){
+    pub fn inherit(parents: (Bot, Bot), neuron_lib: &Vec<&usize>) -> (){
         let mut rng = rand::thread_rng();
 
         // create a genome with zeros
@@ -71,12 +71,16 @@ impl Bot {
 
         if super::MUTATION_ENABLED{
             // mutation
+
+            // c1 is the counter of the outer for loop
             for gene in genome.iter_mut(){
                 
                 let mut hex_gene: Vec<char> = format!("{:X}", gene).chars().collect(); // convert u32 in hex string
+                let og_gene = hex_gene.clone();
 
                 // go through every letter and change it by chance
-                let mut c = 0;
+                // c2 is the counter of the inner for loop
+                let mut c2 = 0;
                 for letter in hex_gene.iter_mut(){
                     match rng.gen_bool(super::MUTATION_RATE) { 
                         // if mutation occurs, the loop searches for a new random valid gene 
@@ -85,16 +89,16 @@ impl Bot {
                         true => *letter =   
                             loop{let new_letter = std::char::from_u32(rng.gen_range(0..16u32)).unwrap();
                                 // the new_gene is a copy of the gene
-                                let mut new_gene = hex_gene.clone();
-                                new_gene[c] = new_letter; // the new letter is changed and checked
-                                match super::neurons::valid_gene(new_gene){
+                                let mut new_gene = og_gene.clone();
+                                new_gene[c2] = new_letter; // the new letter is changed and checked
+                                match super::neurons::valid_gene(new_gene, neuron_lib){
                                     true=>break new_letter,
                                     false=> continue
                                 }
                             }, 
                         false => {}
                     }
-                    c+=1;
+                    c2+=1;
                 }
             }
         }

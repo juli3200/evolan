@@ -56,43 +56,65 @@ fn create_gene(lib: &Vec<&usize>) -> u32{
 }
 
 
-pub fn create_genome() -> [u32; super::GENOME_LENGTH]{
-    // the neuron lib is a library whitch is used for the creation of the genes
-    let mut neuron_lib: Vec<&usize> = Vec::new();
-    neuron_lib.push(&(INPUT_NEURONS as usize));
-
-    for _ in 0..super::INNER_LAYERS{
-        neuron_lib.push(&super::INNER_NEURONS);
-    }
-    neuron_lib.push(&(OUTPUT_NEURONS as usize));
-
+pub fn create_genome(neuron_lib: &Vec<&usize>) -> [u32; super::GENOME_LENGTH]{
     let mut gene: [u32; super::GENOME_LENGTH] = [0u32; super::GENOME_LENGTH];
     for g in gene.iter_mut(){
-        *g = create_gene(&neuron_lib);
+        *g = create_gene(neuron_lib);
     }
 
     let gene = gene;
     gene
 }
 
+// trait for u32 and Vec<char> for decode gene
+pub trait GeneTrait{
+    fn decode_gene(&self) -> [u32; 5];
+}
 
-pub fn valid_gene(gene: Vec<char>)-> bool{
-    ///
-    ///
-    /// 
-    /// 
-    /// 
-    /// 
-    /// 
-    /// todo: check if gene is valid 
-    /// used in objects::inherit (mutation)
-    /// create possibility to disable mixed genes from two parents(one parent/clone)
-    /// next create spawn function
-    /// 
-    /// 
-    /// 
-    /// 
-    /// 
+impl GeneTrait for u32{
+    fn decode_gene(&self) -> [u32; 5]{
+        let type_1_mask:u32 = 0b11 << 30;
+        let id_1_mask: u32 = 0b11111 << 25;
+        let type_2_mask: u32 = 0b11 << 23;
+        let id_2_mask: u32= 0b11111 << 18;
+        let weight_mask: u32 = 0b111111111111111111;
+    
+        // Extract values using bit masking and shifting
+        let type_1 = (*self & type_1_mask) >> 30;
+        let id_1 = (*self & id_1_mask) >> 25;
+        let type_2 = (*self  & type_2_mask) >> 23;
+        let id_2 = (*self & id_2_mask) >> 18;
+        let weight = *self & weight_mask;
+
+        [type_1, id_1, type_2, id_2, weight]
+    }
+}
+
+impl GeneTrait for Vec<char> {
+    fn decode_gene(&self) -> [u32; 5] {
+        // convert the vec<char> in a string
+        let string_gene: String = self.into_iter().collect();
+        // convert the hex string in a u32 and perform the .decode_gene methode
+        u32::from_str_radix(&string_gene, 16).expect("REASON").decode_gene()
+
+    }
+}
+
+
+pub fn valid_gene(gene: Vec<char>, neuron_lib: &Vec<&usize>)-> bool{
+    // checks if mutated gene is valid
+
+    // decode Vec<char> gene 
+    let decoded_gene: [u32; 5] = gene.decode_gene();
+
+    // check
+    if (decoded_gene[0]as usize) > super::INNER_LAYERS{return false;}
+    if decoded_gene[1] as usize >= *neuron_lib[decoded_gene[0] as usize]{return false;}
+
+    if (decoded_gene[2]as usize) > super::INNER_LAYERS{return false;}
+    if decoded_gene[3] as usize >= *neuron_lib[decoded_gene[2] as usize]{return false;}
+
+    true
 }
 
 
