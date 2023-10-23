@@ -5,16 +5,11 @@ use std::env::consts::FAMILY;
 use rand::Rng;
 use super::ObjectTrait;
 
-type WorldType = super::World;
-
 // impl of ObjectTrait for every Object
 impl ObjectTrait for Bot{
     fn pos(&self)->(super::Dow, super::Dow) {(self.x, self.y)}
 }
 impl ObjectTrait for BarrierBlock{
-    fn pos(&self)->(super::Dow, super::Dow) {(self.x, self.y)}
-}
-impl ObjectTrait for Block {
     fn pos(&self)->(super::Dow, super::Dow) {(self.x, self.y)}
 }
 
@@ -108,7 +103,7 @@ impl Bot {
 
     // the spawn function adds further information(coordinates) & is called after the World::new() in the World::spawn
     // for the spawn function either the new or the inherit function have already had to be called 
-    pub fn spawn(& mut self, world: &super::World)-> (){}
+    pub fn spawn<'a>(& mut self, world: &super::World<'a>)-> (){}
 
 }
 
@@ -132,12 +127,12 @@ impl BarrierBlock{
 }
 
 #[derive(Debug, Clone)]
-pub struct Block{
+pub struct Block<'a>{
     // this block contains information about the guest of the block
     // e.g a bot han be a guest in the Block
 
-    guest: Option<[usize; 2]>,
-
+    pub guest: Option<&'a dyn ObjectTrait>,
+    
     // coordinates; i32
     x: super::Dow,
     y: super::Dow
@@ -147,8 +142,8 @@ pub struct Block{
 }
 
 
-impl Block{
-    pub fn new(x: super::Dow, y: super::Dow)-> Self{
-        Block {guest: None, x: x, y: y }
+impl <'a>Block<'a>{
+    pub fn new(guest: Option<&'a dyn ObjectTrait>, x: super::Dow, y: super::Dow)-> Self{
+        Block {guest: guest, x: x, y: y }
     }
 }

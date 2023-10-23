@@ -26,35 +26,36 @@ impl std::fmt::Debug for dyn ObjectTrait{
 
 
 #[derive(Debug)]
-pub struct World{
+pub struct World<'a>{
     //setting dimension of the world; (u8, u8)
     dim: (Dow, Dow),
 
     //number of bots and blocks etc...
     n_of_bots: u16,
-    n_of_barrier_blocks: u16,
 
     // holding of the bots and blocks etc
     bot_vec: Vec<objects::Bot>,
     barrier_block_vec: Vec<objects::BarrierBlock>,
 
     // grid with coordinates of object
-    grid: Vec<Vec<objects::Block>>,
+    grid: Vec<Vec<objects::Block<'a>>>,
 
     neuron_lib: Vec<&'static usize>
 
+    //
+    // maybe add a vec of all generations
+    //
+
+
 }
 
-impl World{
-    pub fn new(dim: (Dow, Dow), n_of_bots: u16, barrier_blocks_pos: Vec<(Dow, Dow)>) -> Self {
-        {
-            // all variables get out of scope 
-            let n_of_bots_usize: usize = n_of_bots as usize;
-            // checking input
-            if dim.0 == Dow::MAX || dim.1 == Dow::MAX{panic!("dim.0/dim.1 must be smaller than Dow::Max; buffer needed")}
-            if dim.0 as usize * (dim.1 as usize) < (n_of_bots_usize+barrier_blocks_pos.len()){
-                panic!("number of objects must be smaller than dim.0*dim.1")}
-        }
+impl <'a>World<'a>{
+    pub fn new(dim: (Dow, Dow), n_of_bots: u16) -> Self {
+
+        // checking input
+        if dim.0 == Dow::MAX || dim.1 == Dow::MAX{panic!("dim.0/dim.1 must be smaller than Dow::Max; buffer needed")}
+        if dim.0 as usize * (dim.1 as usize) < n_of_bots as usize{
+            panic!("number of objects must be smaller than dim.0*dim.1")}
 
         // the neuron lib is a library whitch is used for the creation of the genes
             let mut neuron_lib: Vec<&usize> = Vec::new();
@@ -66,13 +67,11 @@ impl World{
             neuron_lib.push(&(neurons::OUTPUT_NEURONS as usize));
         //
 
-        // barrier_blocks_pos is a vector of every barrier_block
+        // the bot vec contains every bot
             let mut bot_vec: Vec<objects::Bot> = vec![];
             for i in 0..n_of_bots{
                 bot_vec.push(objects::Bot::new(neurons::create_genome(&neuron_lib)));
             }
-            let mut barrier_block_vec: Vec<objects::BarrierBlock>= vec![];
-            // here barrier blocks can be added
         //
 
         // the grid is a 2d vec with Blocks in it
@@ -80,18 +79,32 @@ impl World{
         for y in 0..dim.1{
             let mut row = Vec::new();
             for x in 0..dim.0{
-                row.push(objects::Block::new(x, y));
+                row.push(objects::Block::new(None, x, y));
             }
             grid.push(row);
         }
 
         World { dim,
                 n_of_bots,
-                n_of_barrier_blocks: barrier_blocks_pos.len() as u16,
                 bot_vec,
-                barrier_block_vec,
+                barrier_block_vec: vec![],
                 grid,
                 neuron_lib}
+    }
 
+    pub fn spawn_barrier_blocks(&mut self, barrier_blocks_pos: Vec<(Dow, Dow)>){
+        // this function adds the barrier blocks
+
+        // check input
+        if self.n_of_bots as usize + barrier_blocks_pos.len() + self.barrier_block_vec.len() > self.dim.0 as usize * self.dim.1 as usize{
+            panic!("number of objects must be smaller than dim.0*dim.1")
+        }
+
+        for coord in barrier_blocks_pos.into_iter() {
+            let index = self.barrier_block_vec.len()-1;
+            self.barrier_block_vec.push(objects::BarrierBlock::new(coord.0, coord.1));
+            self.grid[coord.1 as usize][coord.0 as usize] = objects::Block::new(Some(&self.barrier_block_vec[index]), coord.0, coord.1);
+            
+        }
     }
 }
