@@ -1,7 +1,3 @@
-#![allow(dead_code)]
-
-use std::env::consts::FAMILY;
-
 use rand::Rng;
 use super::ObjectTrait;
 
@@ -103,7 +99,10 @@ impl Bot {
 
     // the spawn function adds further information(coordinates) & is called after the World::new() in the World::spawn
     // for the spawn function either the new or the inherit function have already had to be called 
-    pub fn spawn<'a>(& mut self, world: &super::World<'a>)-> (){}
+    pub fn spawn(& mut self, x:super::Dow, y:super::Dow){
+        self.x = x;
+        self.y = y;
+    }
 
 }
 
@@ -127,11 +126,11 @@ impl BarrierBlock{
 }
 
 #[derive(Debug, Clone)]
-pub struct Block<'a>{
+pub struct Block{
     // this block contains information about the guest of the block
     // e.g a bot han be a guest in the Block
 
-    pub guest: Option<&'a dyn ObjectTrait>,
+    pub guest: Option<*const/*add a mut if needed*/ dyn ObjectTrait>,
     
     // coordinates; i32
     x: super::Dow,
@@ -142,8 +141,16 @@ pub struct Block<'a>{
 }
 
 
-impl <'a>Block<'a>{
-    pub fn new(guest: Option<&'a dyn ObjectTrait>, x: super::Dow, y: super::Dow)-> Self{
-        Block {guest: guest, x: x, y: y }
+impl Block{
+    pub fn new(guest: Option<*const/*add a mut if needed*/ dyn ObjectTrait>, x: super::Dow, y: super::Dow)-> Self{
+        Block {guest, x, y }
+    }
+
+    pub fn edit_guest(&mut self, guest: Option<*const/*add a mut if needed*/dyn ObjectTrait>){
+        match guest{
+            None  => {self.guest = None;}
+            Some(raw_pointer) => {
+                self.guest = Some(raw_pointer)}
+        }
     }
 }

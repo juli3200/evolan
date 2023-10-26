@@ -1,6 +1,6 @@
 #![allow(dead_code, unused_variables, unused_imports)]
 mod world;
-use world::{objects, neurons};
+use world::{objects, neurons, criteria};
 
 
 

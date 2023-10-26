@@ -1,5 +1,8 @@
+use rand::Rng;
+
 pub mod objects;
 pub mod neurons;
+pub mod criteria;
 
 // constants
 pub const GENOME_LENGTH: usize = 16; // lenght of genomes
@@ -26,19 +29,22 @@ impl std::fmt::Debug for dyn ObjectTrait{
 
 
 #[derive(Debug)]
-pub struct World<'a>{
+pub struct World{
     //setting dimension of the world; (u8, u8)
     dim: (Dow, Dow),
 
-    //number of bots and blocks etc...
+    //number of bots
     n_of_bots: u16,
+
+    // generation of the world
+    generation: usize,
 
     // holding of the bots and blocks etc
     bot_vec: Vec<objects::Bot>,
     barrier_block_vec: Vec<objects::BarrierBlock>,
 
     // grid with coordinates of object
-    grid: Vec<Vec<objects::Block<'a>>>,
+    grid: Vec<Vec<objects::Block>>,
 
     neuron_lib: Vec<&'static usize>
 
@@ -49,7 +55,7 @@ pub struct World<'a>{
 
 }
 
-impl <'a>World<'a>{
+impl World{
     pub fn new(dim: (Dow, Dow), n_of_bots: u16) -> Self {
 
         // checking input
@@ -86,10 +92,11 @@ impl <'a>World<'a>{
 
         World { dim,
                 n_of_bots,
+                generation: 0 as usize,
                 bot_vec,
                 barrier_block_vec: vec![],
                 grid,
-                neuron_lib}
+                neuron_lib,}
     }
 
     pub fn spawn_barrier_blocks(&mut self, barrier_blocks_pos: Vec<(Dow, Dow)>){
@@ -102,9 +109,42 @@ impl <'a>World<'a>{
 
         for coord in barrier_blocks_pos.into_iter() {
             let index = self.barrier_block_vec.len()-1;
-            self.barrier_block_vec.push(objects::BarrierBlock::new(coord.0, coord.1));
-            self.grid[coord.1 as usize][coord.0 as usize] = objects::Block::new(Some(&self.barrier_block_vec[index]), coord.0, coord.1);
+
+            self.barrier_block_vec.push(objects::BarrierBlock::new(coord.0, coord.1)); // create new barrier block
+
+            // create the raw pointer witch is passed to the Block on the coordinate
+            let raw_pointer: *const dyn ObjectTrait = &self.barrier_block_vec[index]; 
+            self.grid[coord.1 as usize][coord.0 as usize].edit_guest(Some(raw_pointer));
             
         }
+    }
+
+    pub fn spawn_bots(&mut self){
+        let mut rng = rand::thread_rng();
+
+
+        for bot in self.bot_vec.iter_mut(){
+
+            // gen coords and check validaty
+            let coords = loop{
+                let x = rng.gen_range(0..self.dim.0) as usize;
+                let y = rng.gen_range(0..self.dim.1) as usize;
+
+                // check coords
+                match self.grid[y][x].guest{
+                    None => {break (x, y);}
+                    Some(t) =>{continue;}
+                }
+            };
+
+            bot.spawn(coords.0 as Dow, coords.1 as Dow);
+
+            // create raw pointer
+            let raw_pointer: *const dyn ObjectTrait = bot;
+            // add the raw pointer to the grid
+            self.grid[coords.1][coords.0].edit_guest(Some(raw_pointer));
+        }
+
+
     }
 }

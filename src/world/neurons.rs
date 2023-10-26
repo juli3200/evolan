@@ -11,11 +11,13 @@ pub enum InputNeurons{
 }
 
 
-pub const OUTPUT_NEURONS: u8 = 2; // number of output neurons
+pub const OUTPUT_NEURONS: u8 = 3; // number of output neurons
 #[derive(Debug, Clone)]
 pub enum OutputNeurons{
     // zero is backwards 1 is forwards
-    Move(bool),
+    MoveStraight(bool),
+    // left or right movement
+    MoveSideways(bool),
     // angle witch it must be turned
     Turn(u16)
 
