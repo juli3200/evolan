@@ -10,6 +10,7 @@ pub const INNER_LAYERS: usize = 1; // max val 3; because of gene generation (mor
 pub const INNER_NEURONS: usize = 2; // inner neurons per inner layer
 pub const MUTATION_ENABLED: bool = true; // used for performance 
 pub const MUTATION_RATE: f64 = 0.001; // mutation rate of the genes (one hexadecimal letter will be changed)
+pub const NEURONAL_MUTATION_ENABLED: bool = true; // is the mutation neuron active
 
 // Dimension_of_world; type of dimension val; if it is higher than 255 change to u16
 pub type Dow = u8;
@@ -38,6 +39,9 @@ pub struct World{
 
     // generation of the world
     generation: usize,
+    generation_time: u16, // how long a generation is alive
+    time: u64, // time overall; 
+    age_of_gen: u16,
 
     // holding of the bots and blocks etc
     bot_vec: Vec<objects::Bot>,
@@ -92,7 +96,10 @@ impl World{
 
         World { dim,
                 n_of_bots,
-                generation: 0 as usize,
+                generation: 0,
+                generation_time:0,
+                time: 0,
+                age_of_gen: 0,
                 bot_vec,
                 barrier_block_vec: vec![],
                 grid,

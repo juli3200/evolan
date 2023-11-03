@@ -2,3 +2,7 @@ add 3 dim
 add buildblocks
 add food 
 add unlimited generation time
+https://pyo3.rs/v0.20.0/python_from_rust.html
+add python ui to select blocks 
+then add neurons
+then add calculating system

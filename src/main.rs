@@ -6,9 +6,8 @@ use world::{objects, neurons, criteria};
 
 
 fn main(){
-    println!("Hello, world!");
-    let v = vec![objects::Bot::new([0u32; world::GENOME_LENGTH]), objects::Bot::new([1u32; world::GENOME_LENGTH]), objects::Bot::new([2u32; world::GENOME_LENGTH])];
-    for b in v.iter(){
-        println!("{:?}", b)
-    }
+    let main_world: world::World = world::World::new((254, 254), 100);
+
+    let barrier_blocks = vec![()];
+    
 }

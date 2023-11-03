@@ -1,25 +1,53 @@
 use rand::Rng;
 
-pub const INPUT_NEURONS: u8 = 3; // number of input neurons
+pub const INPUT_NEURONS: u8 = 7; // number of input neurons; max 32
 #[derive(Debug, Clone)]
 pub enum InputNeurons{
     Random(f32),
-    Density(f32),
-    Age(u16),
+    PopulationDensity(f32), 
+    PopulationSize(u16),
+    Age(u16), // age of bot
+    Time(u64), // 
+    X(super::Dow),
+    Y(super::Dow),
+    DistanceNearestBoarder(u32),
+    Angle(u8),
 
+    // angle nearest neighbour
+    AngleNN(u8),
+    // Distance nearest neighbour
+    DistanceNN
 
 }
 
 
-pub const OUTPUT_NEURONS: u8 = 3; // number of output neurons
+pub const OUTPUT_NEURONS: u8 = 10; // number of output neurons; MAX 32
 #[derive(Debug, Clone)]
 pub enum OutputNeurons{
+    // angle is turned +90 or -90
+    TurnRight,
+    TurnLeft,
+
     // zero is backwards 1 is forwards
     MoveStraight(bool),
     // left or right movement
     MoveSideways(bool),
-    // angle witch it must be turned
-    Turn(u16)
+    // move in x_direction; 1 positive x, -1 negative
+    MoveX(bool),
+    // move in y direction
+    MoveY(bool),
+    // move in rnd deirection
+    MoveRandom(u8),
+
+    // mutation and modification
+    // these Neurons need an extrem high value to be fired
+    Mutate,
+    // modification
+    Modify,
+
+    // kill neuron can be deactivated
+    // kill bot in front
+    Kill
 
 }
 
