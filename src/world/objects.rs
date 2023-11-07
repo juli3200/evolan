@@ -1,3 +1,5 @@
+use std::vec;
+
 use rand::Rng;
 use super::ObjectTrait;
 
@@ -19,8 +21,8 @@ pub struct Bot{
 
     // coordinates; i32
     // default of the coords are super::Dow::MAX; this coordinate is treated as None
-    x: super::Dow,
-    y: super::Dow,
+    pub x: super::Dow,
+    pub y: super::Dow,
     
     // angle 
     angle: u8,
@@ -28,7 +30,7 @@ pub struct Bot{
     // genome; hex -> view concept
     genome: [u32; super::GENOME_LENGTH],
     // output; vec of outputs from the output enum 
-    output: Vec<super::neurons::OutputNeurons>,
+
 }
 
 impl Bot {
@@ -38,13 +40,12 @@ impl Bot {
         Bot { x: super::Dow::MAX, 
               y: super::Dow::MAX, 
               angle: 0, 
-              genome: genome, 
-              output: vec![]}
+              genome: genome, }
     }
 
     // with the inherit function it's not neccesary to call the new function
     // the genome is provided using the 
-    pub fn inherit(parents: (Bot, Bot), neuron_lib: &Vec<&usize>) -> (){
+    pub fn inherit(parents: (Bot, Bot), neuron_lib: &Vec<&usize>) -> Self{
         let mut rng = rand::thread_rng();
 
         // create a genome with zeros
@@ -61,38 +62,11 @@ impl Bot {
         }
 
         if super::MUTATION_ENABLED{
-            // mutation
-
-            // c1 is the counter of the outer for loop
-            for gene in genome.iter_mut(){
-                
-                let mut hex_gene: Vec<char> = format!("{:X}", gene).chars().collect(); // convert u32 in hex string
-                let og_gene = hex_gene.clone();
-
-                // go through every letter and change it by chance
-                // c2 is the counter of the inner for loop
-                let mut c2 = 0;
-                for letter in hex_gene.iter_mut(){
-                    match rng.gen_bool(super::MUTATION_RATE) { 
-                        // if mutation occurs, the loop searches for a new random valid gene 
-                        // the validaty is checked with the neurons::valid_gene fn
-                        // if valid the new_letter is assigned to the *letter
-                        true => *letter =   
-                            loop{let new_letter = std::char::from_u32(rng.gen_range(0..16u32)).unwrap();
-                                // the new_gene is a copy of the gene
-                                let mut new_gene = og_gene.clone();
-                                new_gene[c2] = new_letter; // the new letter is changed and checked
-                                match super::neurons::valid_gene(new_gene, neuron_lib){
-                                    true=>break new_letter,
-                                    false=> continue
-                                }
-                            }, 
-                        false => {}
-                    }
-                    c2+=1;
-                }
-            }
+            // call the neurons::mutate fn to mutate the genome
+            super::neurons::mutate(&mut genome, neuron_lib)
         }
+
+        Self::new(genome)
 
 
     }
@@ -102,6 +76,11 @@ impl Bot {
     pub fn spawn(& mut self, x:super::Dow, y:super::Dow){
         self.x = x;
         self.y = y;
+    }
+
+    pub fn neurons_to_comute() -> Vec<(Box<dyn super::NeuronTrait>, Box<dyn super::NeuronTrait>)>{
+        vec![(Box::new(super::neurons::InputNeurons::AlwaysFalse), Box::new(super::neurons::InputNeurons::AlwaysFalse))]
+
     }
 
 }

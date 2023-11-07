@@ -1,86 +1,15 @@
 use rand::Rng;
 
-pub const INPUT_NEURONS: u8 = 19; // number of input neurons; max 32
-#[derive(Debug, Clone)]
-pub enum InputNeurons{
-    AlwaysTrue, // 1
-    AlwaysFalse, // 0
-    // random input
-    Random(f32),
-    PopulationDensity(f32), 
-    PopulationSize(u16),
-    // age of bot
-    Age(u16), 
-    // time of the whole world
-    Time(u64),
-    // x coord
-    X(super::Dow), 
-    // y coord
-    Y(super::Dow),
-    // own angle
-    Angle(u8),
-
-    // angle nearest neighbour
-    AngleNN(u8),
-    // Distance nearest neighbour
-    DistanceNN(super::Dow),
-
-    // distance to nearest boarder
-    DistanceNearestBoarder(u32),
-    // relation between northh south -> north 0; south -> 1
-    DistanceNorthSouth(super::Dow),
-    // relation between west east
-    DistanceWestEast(super::Dow),
-
-    // if block in an angle hosts a guest u8 -> angle
-    BlockedAround(u8),
-
-    // received communication hex letter pointer to the array in the guest block
-    ReComm(*const [u8]),
-    // length of the array
-    LenghtComm(usize),
-    // most common letter
-    MostCommonLetter(u8),
-
-}
-
-
-pub const OUTPUT_NEURONS: u8 = 12; // number of output neurons; MAX 32
-#[derive(Debug, Clone)]
-pub enum OutputNeurons{
-    // angle is turned +90 or -90
-    TurnRight,
-    TurnLeft,
-
-    // zero is backwards 1 is forwards
-    MoveStraight(bool),
-    // left or right movement
-    MoveSideways(bool),
-    // move in x_direction; 1 positive x, -1 negative
-    MoveX(bool),
-    // move in y direction
-    MoveY(bool),
-    // move in rnd deirection
-    MoveRandom(u8),
-
-    // send letters
-    SendComm(u8),
-
-    // can live for a specific time; really high value to be fired
-    PlaceBarrierBlock,
-
-    // mutation and modification
-    // these Neurons need an extrem high value to be fired
-    Mutate,
-    // modification
-    Modify,
-
-    // kill neuron can be deactivated
-    // kill bot in front
-    Kill
-
-}
-
+pub mod input_functions;
+// the neuron register is used to convert genes to real values
+ 
+/*
+const NEURON_REGISTER: ([&Fn; crate::settings::INPUT_NEURONS], [&Fn; crate::settings::OUTPUT_NEURONS]) = (
+    [&input_functions::always_true, &input_functions::always_false, 
+    &input_functions::random, &input_functions::population_density],
+    []
+);
+*/
 fn create_gene(lib: &Vec<&usize>) -> u32{
     /*
     :return: one gene with 2-type_bits, 5 id bits, 2 type bits, 5 id bits and 18 weight bits in hex format
@@ -175,6 +104,45 @@ pub fn valid_gene(gene: Vec<char>, neuron_lib: &Vec<&usize>)-> bool{
     if decoded_gene[3] as usize >= *neuron_lib[decoded_gene[2] as usize]{return false;}
 
     true
+}
+
+
+pub fn mutate(genome: &mut[u32; super::GENOME_LENGTH], neuron_lib: &Vec<&usize>) -> [u32; super::GENOME_LENGTH]{
+    // mutation
+
+    let mut rng = rand::thread_rng();
+
+    // c1 is the counter of the outer for loop
+    for gene in genome.iter_mut(){
+        
+        let mut hex_gene: Vec<char> = format!("{:X}", gene).chars().collect(); // convert u32 in hex string
+        let og_gene = hex_gene.clone();
+
+        // go through every letter and change it by chance
+        // c2 is the counter of the inner for loop
+        let mut c2 = 0;
+        for letter in hex_gene.iter_mut(){
+            match rng.gen_bool(super::MUTATION_RATE) { 
+                // if mutation occurs, the loop searches for a new random valid gene 
+                // the validaty is checked with the neurons::valid_gene fn
+                // if valid the new_letter is assigned to the *letter
+                true => *letter =   
+                    loop{let new_letter = std::char::from_u32(rng.gen_range(0..16u32)).unwrap();
+                        // the new_gene is a copy of the gene
+                        let mut new_gene = og_gene.clone();
+                        new_gene[c2] = new_letter; // the new letter is changed and checked
+                        match valid_gene(new_gene, neuron_lib){
+                            true=>break new_letter,
+                            false=> continue
+                        }
+                    }, 
+                false => {}
+            }
+            c2+=1;
+        }
+    }
+
+    genome
 }
 
 

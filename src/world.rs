@@ -5,15 +5,8 @@ pub mod neurons;
 pub mod criteria;
 
 // constants
-pub const GENOME_LENGTH: usize = 16; // lenght of genomes
-pub const INNER_LAYERS: usize = 1; // max val 3; because of gene generation (more bites assigned to the index bits)
-pub const INNER_NEURONS: usize = 2; // inner neurons per inner layer
-pub const MUTATION_ENABLED: bool = true; // used for performance 
-pub const MUTATION_RATE: f64 = 0.001; // mutation rate of the genes (one hexadecimal letter will be changed)
-pub const NEURONAL_MUTATION_ENABLED: bool = true; // is the mutation neuron active
+use crate::settings::*;
 
-// Dimension_of_world; type of dimension val; if it is higher than 255 change to u16
-pub type Dow = u8;
 
 // trait for all Objects
 pub trait ObjectTrait{
@@ -69,12 +62,12 @@ impl World{
 
         // the neuron lib is a library whitch is used for the creation of the genes
             let mut neuron_lib: Vec<&usize> = Vec::new();
-            neuron_lib.push(&(neurons::INPUT_NEURONS as usize));
+            neuron_lib.push(&(INPUT_NEURONS as usize));
 
             for _ in 0..INNER_LAYERS{
                 neuron_lib.push(&INNER_NEURONS);
             }
-            neuron_lib.push(&(neurons::OUTPUT_NEURONS as usize));
+            neuron_lib.push(&(OUTPUT_NEURONS as usize));
         //
 
         // the bot vec contains every bot

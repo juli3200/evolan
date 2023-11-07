@@ -1,5 +1,7 @@
 #![allow(dead_code, unused_variables, unused_imports)]
 mod world;
+mod calculate;
+pub mod settings;
 use world::{objects, neurons, criteria};
 
 
