@@ -1,3 +1,5 @@
+use std::ops::RangeBounds;
+
 use super::super::{objects::Bot, World};
 use crate::settings::*;
 
@@ -5,20 +7,8 @@ use rand::Rng;
 
 // make every neuron to a  function
 /* 
-pub enum InputNeurons{
-    // angle nearest neighbour
-    AngleNN(u8),
-    // Distance nearest neighbour
-    DistanceNN(super::Dow),
 
-    // distance to nearest boarder
-    DistanceNearestBoarder(u32),
-    // relation between northh south -> north 0; south -> 1
-    DistanceNorthSouth(super::Dow),
-    // relation between west east
-    DistanceWestEast(super::Dow),
-
-    // if block in an angle hosts a guest u8 -> angle
+    
     BlockedAround(u8),
 
     // received communication hex letter pointer to the array in the guest block
@@ -119,14 +109,65 @@ pub fn y(bot: &Bot, world: &World) -> crate::settings::Dow{bot.y}
 pub fn angle(bot: &Bot, world: &World) -> u8{bot.angle}
 
 // private fn used for all nn functions
-fn nearest_neighbour(bot: &Bot, world: &World) -> (crate::settings::Dow, crate::settings::Dow){
+fn nearest_neighbour(bot: &Bot, world: &World) -> (Dow, Dow){
     
     for i in 1..world.dim[0].min(world.dim[1]){
-        // square and check
+        // ask
+        //
+        //
+        //
+        //
+        //
+        
+        
     }
+    (0, 0)
 }
 
 // distance to nearest neighbour
+pub fn distance_nn(bot: &Bot, world: &World) -> f64{
+    // get the coords of the nn
+    let coords_nn = nearest_neighbour(bot, world);
 
+    // calculate and return the distance
+    ((coords_nn[0] - bot.x)**2 + (coords_nn[1] - bot.y) as f64).sprt()
+}
 
+pub fn angle_nn(bot: &Bot, world: &World) -> u8{
+    let coords_nn = nearest_neighbour(bot, world);
+    // calc the ratio of the triangle between the points
+    let ratio: f64 = (coords_nn[0] - bot.x) / (coords_nn[1] - bot.y);
+    // return the arctangens
+    ratio.atan()
+}
 
+pub fn distance_nearest_boarder(bot: &Bot, world: &World) -> Dow{
+    // create a vec and evaluate the min
+    vec![bot.x, bot.y, world.dim[0]-bot.x, world.dim[1]-bot.y].iter()
+    .min().unwrap()
+}
+
+// relation between northh south -> north 0; south -> 1
+pub fn distance_north_south(bot: &Bot, world: &World) -> f64{
+    bot.y/(world.dim[1]-bot.y)
+}
+
+// relation between west east
+pub fn distance_west_east(bot: &Bot, world: &World) -> f64{
+    bot.x/(world.dim[0]-bot.x)
+}
+
+// if block in an angle hosts a guest
+pub fn blocked_around(bot: &Bot, world: &World) -> bool{
+    // every coordinate whitch needs to be checked
+    let coords = vec![(bot.x, bot.y-1), (bot.x, bot.y+1), 
+    (bot.x-1, bot.y), (bot.x+1, bot.y)];
+
+    for coord in coords.into_iter(){
+        match world.grid[coord[1] as usize][coord[0] as usize] {
+            Some(_) => {true}
+            None => {continue;}
+        }
+    }
+    false
+}

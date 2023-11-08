@@ -25,10 +25,10 @@ pub struct Bot{
     pub y: super::Dow,
     
     // angle 
-    angle: u8,
+    pub angle: u8,
 
     // genome; hex -> view concept
-    genome: [u32; super::GENOME_LENGTH],
+    pub genome: [u32; super::GENOME_LENGTH],
     // output; vec of outputs from the output enum 
 
 }

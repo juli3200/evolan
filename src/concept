@@ -6,3 +6,7 @@ https://pyo3.rs/v0.20.0/python_from_rust.html
 add python ui to select blocks 
 then add neurons
 then add calculating system
+
+Ask server request and data transmittion
+Ask nearest_neuron
+Ask rusch angle

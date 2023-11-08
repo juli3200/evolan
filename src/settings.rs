@@ -15,6 +15,6 @@ pub const MUTATION_RATE: f64 = 0.001; // mutation rate of the genes (one hexadec
 // neurons settings
 pub const KILLING_ENABLED: bool = false;
 pub const NEURONAL_MUTATION_ENABLED: bool = true; // is the mutation neuron active
-pub const NEURONAL_MUTATION_RATE: f64 = 0.0001;
+pub const NEURONAL_MUTATION_RATE: f64 = 0.001;
 pub const DENSITY_SIZE: u32 = 100; // how big the area is for the calculation for the density
 
