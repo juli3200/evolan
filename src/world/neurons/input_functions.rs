@@ -6,19 +6,6 @@ use rand::Rng;
 // make every neuron to a  function
 /* 
 pub enum InputNeurons{
-    PopulationDensity(f32), 
-    PopulationSize(u16),
-    // age of bot
-    Age(u16), 
-    // time of the whole world
-    Time(u64),
-    // x coord
-    X(super::Dow), 
-    // y coord
-    Y(super::Dow),
-    // own angle
-    Angle(u8),
-
     // angle nearest neighbour
     AngleNN(u8),
     // Distance nearest neighbour
@@ -113,8 +100,33 @@ pub fn population_density(bot: &Bot, world: &World) -> f64{
     n_blocks / DENSITY_SIZE**2
 }
 
+// how many bots are alive
+pub fn population_size(bot: &Bot, world: &World) -> u16{world.bots_alive}
 
+// every age is identical; stored in world
+pub fn age(bot: &Bot, world: &World) -> u16{world.age_of_gen}
 
+//time of the world
+pub fn time(bot: &Bot, world: &World) -> u64{world.time}
+
+// x coord
+pub fn x(bot: &Bot, world: &World) -> crate::settings::Dow{bot.x}
+
+// y coord
+pub fn y(bot: &Bot, world: &World) -> crate::settings::Dow{bot.y}
+
+// angle of bot
+pub fn angle(bot: &Bot, world: &World) -> u8{bot.angle}
+
+// private fn used for all nn functions
+fn nearest_neighbour(bot: &Bot, world: &World) -> (crate::settings::Dow, crate::settings::Dow){
+    
+    for i in 1..world.dim[0].min(world.dim[1]){
+        // square and check
+    }
+}
+
+// distance to nearest neighbour
 
 
 

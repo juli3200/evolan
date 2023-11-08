@@ -35,6 +35,7 @@ pub struct World{
     generation_time: u16, // how long a generation is alive
     time: u64, // time overall; 
     age_of_gen: u16,
+    bots_alive: u16, 
 
     // holding of the bots and blocks etc
     bot_vec: Vec<objects::Bot>,
@@ -93,6 +94,7 @@ impl World{
                 generation_time:0,
                 time: 0,
                 age_of_gen: 0,
+                bots_alive: 0,
                 bot_vec,
                 barrier_block_vec: vec![],
                 grid,
@@ -144,6 +146,8 @@ impl World{
             // add the raw pointer to the grid
             self.grid[coords.1][coords.0].edit_guest(Some(raw_pointer));
         }
+
+        self.bots_alive = self.n_of_bots;
 
 
     }

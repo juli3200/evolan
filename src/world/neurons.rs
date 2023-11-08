@@ -98,12 +98,12 @@ pub fn valid_gene(gene: Vec<char>, neuron_lib: &Vec<&usize>)-> bool{
 
     // check
     if (decoded_gene[0]as usize) > super::INNER_LAYERS{return false;}
-    if decoded_gene[1] as usize >= *neuron_lib[decoded_gene[0] as usize]{return false;}
+    else if decoded_gene[1] as usize >= *neuron_lib[decoded_gene[0] as usize]{return false;}
 
-    if (decoded_gene[2]as usize) > super::INNER_LAYERS{return false;}
-    if decoded_gene[3] as usize >= *neuron_lib[decoded_gene[2] as usize]{return false;}
+    else if (decoded_gene[2]as usize) > super::INNER_LAYERS{return false;}
+    else if decoded_gene[3] as usize >= *neuron_lib[decoded_gene[2] as usize]{return false;}
 
-    true
+    else{true}
 }
 
 
