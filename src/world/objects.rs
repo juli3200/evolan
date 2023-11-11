@@ -1,6 +1,8 @@
 use std::vec;
 
 use rand::Rng;
+use crate::calculate;
+
 use super::ObjectTrait;
 
 // impl of ObjectTrait for every Object
@@ -29,7 +31,8 @@ pub struct Bot{
 
     // genome; hex -> view concept
     pub genome: [u32; super::GENOME_LENGTH],
-    // output; vec of outputs from the output enum 
+    
+    pub input: Vec<Vec<[usize; 2]>>
 
 }
 
@@ -40,7 +43,9 @@ impl Bot {
         Bot { x: super::Dow::MAX, 
               y: super::Dow::MAX, 
               angle: 0, 
-              genome: genome, }
+              genome: genome, 
+              input: vec![vec![]]
+              }
     }
 
     // with the inherit function it's not neccesary to call the new function
@@ -63,7 +68,7 @@ impl Bot {
 
         if super::MUTATION_ENABLED{
             // call the neurons::mutate fn to mutate the genome
-            super::neurons::mutate(&mut genome, neuron_lib)
+            super::neurons::mutate(&mut genome, neuron_lib);
         }
 
         Self::new(genome)
@@ -76,10 +81,38 @@ impl Bot {
     pub fn spawn(& mut self, x:super::Dow, y:super::Dow){
         self.x = x;
         self.y = y;
+        self.input = self.neurons_to_compute()
     }
 
-    pub fn neurons_to_comute() -> Vec<(Box<dyn super::NeuronTrait>, Box<dyn super::NeuronTrait>)>{
-        vec![(Box::new(super::neurons::InputNeurons::AlwaysFalse), Box::new(super::neurons::InputNeurons::AlwaysFalse))]
+    fn neurons_to_compute(&self) -> Vec<Vec<[usize; 2]>>{
+        /*
+        ///
+        /// 
+        ///  
+        /// 
+        /// 
+        /// 
+        /// 
+        /// 
+        
+         */
+        // continue here
+
+        let mut a = Vec::new();
+        a.push(Vec::new());
+        a[0].push([18, 18]);
+        a
+    }
+
+    pub fn calculate_input(&self){
+        let mut calc_input_vec = vec![];
+        for neuron in self.input.iter(){
+            calc_input_vec.push([])
+        }
+        //calc
+
+        
+
 
     }
 
@@ -113,7 +146,10 @@ pub struct Block{
     
     // coordinates; i32
     x: super::Dow,
-    y: super::Dow
+    y: super::Dow,
+
+    // received letter
+    pub letters: Vec<u8>,
 
     // more can be added later
 
@@ -122,7 +158,7 @@ pub struct Block{
 
 impl Block{
     pub fn new(guest: Option<*const/*add a mut if needed*/ dyn ObjectTrait>, x: super::Dow, y: super::Dow)-> Self{
-        Block {guest, x, y }
+        Block {guest, x, y, letters: vec![]}
     }
 
     pub fn edit_guest(&mut self, guest: Option<*const/*add a mut if needed*/dyn ObjectTrait>){

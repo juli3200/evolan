@@ -6,6 +6,7 @@ pub mod criteria;
 
 // constants
 use crate::settings::*;
+use rayon::prelude::*;
 
 
 // trait for all Objects
@@ -149,6 +150,17 @@ impl World{
 
         self.bots_alive = self.n_of_bots;
 
+    }
+
+    pub fn calculate_output(&mut self){
+        // for every bot in self.bot_vec 
+        // the function bot.neurons_to_comute is called
+        // this returns a Vec of vecs(one per bot) of vecs(one per neccesery gene)
+        // the process is computed in parrallel with .par_iter() method
+        let input_neurons: Vec<Vec<Vec<[f64; 2]>>> = self.bot_vec.par_iter()
+        .map(|bot| bot.calculate_input()).collect::<Vec<_>>();
+
+        let output_neurons = 
 
     }
 }

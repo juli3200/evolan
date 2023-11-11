@@ -3,13 +3,13 @@ use rand::Rng;
 pub mod input_functions;
 // the neuron register is used to convert genes to real values
  
-/*
+/* 
 const NEURON_REGISTER: ([&Fn; crate::settings::INPUT_NEURONS], [&Fn; crate::settings::OUTPUT_NEURONS]) = (
     [&input_functions::always_true, &input_functions::always_false, 
     &input_functions::random, &input_functions::population_density],
     []
-);
-*/
+);*/
+
 fn create_gene(lib: &Vec<&usize>) -> u32{
     /*
     :return: one gene with 2-type_bits, 5 id bits, 2 type bits, 5 id bits and 18 weight bits in hex format
@@ -107,7 +107,7 @@ pub fn valid_gene(gene: Vec<char>, neuron_lib: &Vec<&usize>)-> bool{
 }
 
 
-pub fn mutate(genome: &mut[u32; super::GENOME_LENGTH], neuron_lib: &Vec<&usize>) -> [u32; super::GENOME_LENGTH]{
+pub fn mutate(genome: &mut[u32; super::GENOME_LENGTH], neuron_lib: &Vec<&usize>){
     // mutation
 
     let mut rng = rand::thread_rng();
@@ -141,8 +141,6 @@ pub fn mutate(genome: &mut[u32; super::GENOME_LENGTH], neuron_lib: &Vec<&usize>)
             c2+=1;
         }
     }
-
-    genome
 }
 
 
