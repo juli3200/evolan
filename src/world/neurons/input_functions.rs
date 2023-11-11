@@ -170,7 +170,7 @@ pub fn mode_letter(bot: &Bot, world: &World) -> f64{
     current_high_val as f64
 }
 
-pub fn lenth_letter(bot: &Bot, world: &World) -> f64{
+pub fn length_letter(bot: &Bot, world: &World) -> f64{
     world.grid[bot.y as usize][bot.x as usize].letters.len() as f64
 }
 

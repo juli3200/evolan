@@ -157,10 +157,11 @@ impl World{
         // the function bot.neurons_to_comute is called
         // this returns a Vec of vecs(one per bot) of vecs(one per neccesery gene)
         // the process is computed in parrallel with .par_iter() method
-        let input_neurons: Vec<Vec<Vec<[f64; 2]>>> = self.bot_vec.par_iter()
-        .map(|bot| bot.calculate_input()).collect::<Vec<_>>();
+        let input_neurons: Vec<Vec<[f64; 2]>> = self.bot_vec.par_iter()
+        .map(unsafe {|bot| bot.calculate_input(&*self)}).collect::<Vec<_>>();
 
-        let output_neurons = 
+        // pass to calculate.rs
+        // todo: create fn in calculate.rs
 
     }
 }

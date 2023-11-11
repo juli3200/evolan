@@ -2,7 +2,7 @@
 pub type Dow = u8;
 
 // number of neurons (edit only if neuron is added)
-pub const INPUT_NEURONS: u8 = 19; // number of input neurons; max 32
+pub const INPUT_NEURONS: u8 = 20; // number of input neurons; max 32
 pub const OUTPUT_NEURONS: u8 = 12; // number of output neurons; MAX 32
 
 // general settings

@@ -104,14 +104,14 @@ impl Bot {
         a
     }
 
-    pub fn calculate_input(&self){
+    pub fn calculate_input(&self, world: &super::World)-> Vec<[f64; 2]>{
         let mut calc_input_vec = vec![];
-        for neuron in self.input.iter(){
-            calc_input_vec.push([])
+        for neuron in self.input[0].iter(){
+            let calculated_input: f64 = super::neurons::INPUT_NEURON_REGISTER[neuron[0]](self, world);
+            calc_input_vec.push([calculated_input, neuron[1] as f64])
         }
-        //calc
-
         
+        calc_input_vec
 
 
     }

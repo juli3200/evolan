@@ -3,12 +3,21 @@ use rand::Rng;
 pub mod input_functions;
 // the neuron register is used to convert genes to real values
  
-/* 
-const NEURON_REGISTER: ([&Fn; crate::settings::INPUT_NEURONS], [&Fn; crate::settings::OUTPUT_NEURONS]) = (
-    [&input_functions::always_true, &input_functions::always_false, 
-    &input_functions::random, &input_functions::population_density],
-    []
-);*/
+ use crate::world::{World, objects::Bot};
+
+pub const INPUT_NEURON_REGISTER: [fn(&Bot, &World) -> f64; crate::settings::INPUT_NEURONS as usize] = 
+    [input_functions::always_true, input_functions::always_false, 
+    input_functions::random, input_functions::population_density, 
+    input_functions::population_density, input_functions::population_size,
+    input_functions::age, input_functions::time, input_functions::x, 
+    input_functions::y, input_functions::distance_nn, input_functions::angle_nn,
+    input_functions::distance_nearest_boarder, input_functions::distance_north_south,
+    input_functions::distance_west_east, input_functions::blocked_angle,
+    input_functions::blocked_around, input_functions::average_letter, 
+    input_functions::mode_letter, input_functions::length_letter];
+
+ /*[&fn(&Bot, &World) -> f64; crate::settings::OUTPUT_NEURONS as usize]*/
+ /*const OUTPUT_NEURON_REGISTER =  */
 
 fn create_gene(lib: &Vec<&usize>) -> u32{
     /*
