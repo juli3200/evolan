@@ -2,9 +2,18 @@ solve error with multiprocessing and
 create fn neurons_to_compute in objects.rs
 test basic functionallities: correct gene creation; mutation; neurons_to_compute
 
+tooooo many inner neurons
+
+create the calculate.rs
 
 -input neurons:
     create fn nearest_neighbour(noe default output of (0, 0))
 
 - output neurons
     code output functions and create the library in neurons.rs
+
+create the cuda version and GPU accelerated version
+
+create python ui
+create way to store world
+
