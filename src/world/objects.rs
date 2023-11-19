@@ -1,9 +1,7 @@
-use std::vec;
-
 use rand::Rng;
-use crate::calculate;
-
 use super::ObjectTrait;
+use super::neurons::GeneTrait;
+use crate::tools;
 
 // impl of ObjectTrait for every Object
 impl ObjectTrait for Bot{
@@ -43,7 +41,7 @@ impl Bot {
         Bot { x: super::Dow::MAX, 
               y: super::Dow::MAX, 
               angle: 0, 
-              genome: genome, 
+              genome, 
               input: vec![vec![]]
               }
     }
@@ -81,10 +79,11 @@ impl Bot {
     pub fn spawn(& mut self, x:super::Dow, y:super::Dow){
         self.x = x;
         self.y = y;
-        self.input = self.neurons_to_compute()
+        self.neurons_to_compute();
     }
 
-    fn neurons_to_compute(&self) -> Vec<Vec<[usize; 2]>>{
+    fn neurons_to_compute(&self){
+        // this function list all 
         /*
         ///
         /// 
@@ -101,7 +100,7 @@ impl Bot {
         let mut a = Vec::new();
         a.push(Vec::new());
         a[0].push([18, 18]);
-        a
+        
     }
 
     pub fn calculate_input(&self, world: &super::World)-> Vec<[f64; 2]>{
@@ -114,6 +113,11 @@ impl Bot {
         calc_input_vec
 
 
+    }
+
+    pub fn draw_graph(&self){
+        let decoded_genes: Vec<[u32; 5]> = self.genome.map(|gene| gene.decode_gene()).to_vec();
+        tools::plot_network::main(&decoded_genes);
     }
 
 }

@@ -45,7 +45,7 @@ pub fn population_density(bot: &Bot, world: &World) -> f64{
     }
 
     // return ratio 
-    (n_blocks / DENSITY_SIZE^2) as f64 
+    (n_blocks / (DENSITY_SIZE.pow(2))) as f64 
 }
 
 // how many bots are alive
@@ -68,17 +68,23 @@ pub fn angle(bot: &Bot, world: &World) -> f64{bot.angle as f64}
 
 // private fn used for all nn functions
 fn nearest_neighbour(bot: &Bot, world: &World) -> (usize, usize){
-    
-    for i in 1..world.dim.0.min(world.dim.1){
-        // ask
-        //
-        // todo
-        //
-        //
-        //
-        
-        
+    // not the true nn is returned, because of efficiency
+    for n in 0..(DENSITY_SIZE/*size of the searched square*//2) as i32{
+        for y in -n..n{
+            for x in -n..n{
+                // check if in grid
+                if x < 0 || x>world.dim.0 as i32{continue;}
+                else if y < 0 || y>world.dim.1 as i32 {continue;}
+
+                match world.grid[y as usize][x as usize].guest{
+                    Some(_) => {return (x as usize, y as usize)},
+                    None => {continue;}
+                }
+            }
+        }
     }
+    
+    // if none is found (0,0) is returned
     (0, 0)
 }
 
@@ -88,8 +94,8 @@ pub fn distance_nn(bot: &Bot, world: &World) -> f64{
     let coords_nn = nearest_neighbour(bot, world);
 
     // calculate and return the distance
-    (((coords_nn.0 as i64 - bot.x as i64)^2 + 
-    (coords_nn.1 as i64- bot.y as i64)^2) as f64).sqrt()
+    (((coords_nn.0 as i64 - bot.x as i64).pow(2) + 
+    (coords_nn.1 as i64- bot.y as i64).pow(2)) as f64).sqrt()
 }
 
 pub fn angle_nn(bot: &Bot, world: &World) -> f64{

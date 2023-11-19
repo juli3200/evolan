@@ -1,4 +1,7 @@
+use std::{process::Output, fmt::write};
+
 use rand::Rng;
+use rayon::prelude::*;
 
 pub mod objects;
 pub mod neurons;
@@ -6,7 +9,7 @@ pub mod criteria;
 
 // constants
 use crate::settings::*;
-use rayon::prelude::*;
+
 
 
 // trait for all Objects
@@ -39,19 +42,32 @@ pub struct World{
     bots_alive: u16, 
 
     // holding of the bots and blocks etc
-    bot_vec: Vec<objects::Bot>,
+    pub bot_vec: Vec<objects::Bot>,
     barrier_block_vec: Vec<objects::BarrierBlock>,
 
     // grid with coordinates of object
     grid: Vec<Vec<objects::Block>>,
 
-    neuron_lib: Vec<&'static usize>
+    pub neuron_lib: Vec<&'static usize>
 
     //
     // maybe add a vec of all generations
     //
 
 
+}
+
+// impl for thread sharing
+unsafe impl Sync for World {}
+
+impl std::fmt::Display for World{
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut text = String::new();
+        text.push_str(&format!("Bots: {}\n", self.n_of_bots));
+        text.push_str(&format!("Dim: {:?}\n", self.dim));
+
+        write!(f, "{}", text)
+    }
 }
 
 impl World{
@@ -156,9 +172,10 @@ impl World{
         // for every bot in self.bot_vec 
         // the function bot.neurons_to_comute is called
         // this returns a Vec of vecs(one per bot) of vecs(one per neccesery gene)
-        // the process is computed in parrallel with .par_iter() method
-        let input_neurons: Vec<Vec<[f64; 2]>> = self.bot_vec.par_iter()
-        .map(unsafe {|bot| bot.calculate_input(&*self)}).collect::<Vec<_>>();
+        let input_neurons: Vec<Vec<[f64; 2]>> = self.bot_vec.par_iter()// the process is computed in parrallel with .par_iter() method
+        .map(|bot| bot.calculate_input(/*make &self immutable*/&*self))
+        // collect the outputs of all bots in a Vec<Vec<[f64; 2]>>
+        .collect::<Vec<_>>();
 
         // pass to calculate.rs
         // todo: create fn in calculate.rs

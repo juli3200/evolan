@@ -1,0 +1,17 @@
+Source,Target,weight
+"inner_neuron1_0","output_function::move_x",-1.2869
+"input_functions::population_density","inner_neuronnnnn0_0",-3.4340
+"input_functions::population_density","output_function::turn_right",-2.0250
+"inner_neuron1_0","inner_neuronnnnn0_6",-3.7308
+"input_functions::time","inner_neuronnnnn0_1",-3.6163
+"inner_neuron1_0","inner_neuronnnnn0_10",-2.5982
+"inner_neuron1_1","output_function::send_comm",-3.9116
+"input_functions::always_false","inner_neuronnnnn0_0",-2.0117
+"inner_neuron1_1","output_function::kill",-1.1913
+"input_functions::always_true","output_function::turn_left",-1.3789
+"input_functions::always_false","inner_neuronnnnn0_1",-3.3034
+"inner_neuron1_0","inner_neuronnnnn0_4",-1.9680
+"input_functions::distance_west_east","inner_neuronnnnn0_1",-3.8723
+"input_functions::angle_nn","output_function::turn_right",-0.0206
+"inner_neuron1_1","inner_neuronnnnn0_8",-2.3444
+"inner_neuron1_0","inner_neuronnnnn0_5",-2.4799

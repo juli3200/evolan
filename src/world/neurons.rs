@@ -3,7 +3,7 @@ use rand::Rng;
 pub mod input_functions;
 // the neuron register is used to convert genes to real values
  
- use crate::world::{World, objects::Bot};
+use crate::world::{World, objects::Bot};
 
 pub const INPUT_NEURON_REGISTER: [fn(&Bot, &World) -> f64; crate::settings::INPUT_NEURONS as usize] = 
     [input_functions::always_true, input_functions::always_false, 
@@ -17,7 +17,21 @@ pub const INPUT_NEURON_REGISTER: [fn(&Bot, &World) -> f64; crate::settings::INPU
     input_functions::mode_letter, input_functions::length_letter];
 
  /*[&fn(&Bot, &World) -> f64; crate::settings::OUTPUT_NEURONS as usize]*/
- /*const OUTPUT_NEURON_REGISTER =  */
+ /*const OUTPUT_NEURON_REGISTER =  [&fn(&mut Bot, &mut World) -> f64; crate::settings::OUTPUT_NEURONS as usize]
+ output_function::turn_right,
+output_function::turn_left,
+output_function::move_straight,
+output_function::move_sideways,
+output_function::move_x,
+output_function::move_y,
+output_function::move_random,
+output_function::send_comm,
+output_function::place_barrier_block,
+output_function::mutate,
+output_function::modify,
+output_function::kill
+ 
+ */
 
 fn create_gene(lib: &Vec<&usize>) -> u32{
     /*
@@ -42,7 +56,7 @@ fn create_gene(lib: &Vec<&usize>) -> u32{
 
     // create type and id for second neuron
     let type_2 = rng.gen_range(0..=(super::INNER_LAYERS)) as u32; // 0 is for 1. layer as described above
-    let id_2 = rng.gen_range(0..(*lib[type_1 as usize]+ 1)) as u32;
+    let id_2 = rng.gen_range(0..(*lib[type_1 as usize + 1])) as u32;
 
     // weight bits; 18 bits
     let weight = rng.gen_range(0..2u32.pow(18)); // 18 bits long number; is converted to a float between +-4

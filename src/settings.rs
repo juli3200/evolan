@@ -1,3 +1,4 @@
+pub const OUTPUT_FOLDER: &str = "output";
 // Dimension_of_world; type of dimension val; if it is higher than 255 change to u16
 pub type Dow = u8;
 
@@ -6,7 +7,7 @@ pub const INPUT_NEURONS: u8 = 20; // number of input neurons; max 32
 pub const OUTPUT_NEURONS: u8 = 12; // number of output neurons; MAX 32
 
 // general settings
-pub const GENOME_LENGTH: usize = 16; // lenght of genomes
+pub const GENOME_LENGTH: usize = 16; // length of genomes
 pub const INNER_LAYERS: usize = 1; // max val 3; because of gene generation (more bites assigned to the index bits)
 pub const INNER_NEURONS: usize = 2; // inner neurons per inner layer
 pub const MUTATION_ENABLED: bool = true; // used for performance 
