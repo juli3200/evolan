@@ -1,8 +1,8 @@
-solve error with multiprocessing and 
 create fn neurons_to_compute in objects.rs
-test basic functionallities: correct gene creation; mutation; neurons_to_compute
+mutation !!!!!
+test basic functionallities: mutation; neurons_to_compute
 
-tooooo many inner neurons
+to many inner neurons
 
 create the calculate.rs
 

@@ -20,5 +20,8 @@ fn main(){
     println!("{:?}", main_world.neuron_lib);
 
     println!("{:?}", 344448949.decode_gene());
-    main_world.bot_vec[0].draw_graph();
+    println!("{:X}; {:X}", 344448949, main_world.bot_vec[0].genome[0]);
+    neurons::mutate(&mut main_world.bot_vec[0].genome, &main_world.neuron_lib);
+    println!("{:X}; {:X}", 344448949, main_world.bot_vec[0].genome[0]);
+    //main_world.bot_vec[0].draw_graph();
 }

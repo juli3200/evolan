@@ -11,7 +11,7 @@ pub const GENOME_LENGTH: usize = 16; // length of genomes
 pub const INNER_LAYERS: usize = 1; // max val 3; because of gene generation (more bites assigned to the index bits)
 pub const INNER_NEURONS: usize = 2; // inner neurons per inner layer
 pub const MUTATION_ENABLED: bool = true; // used for performance 
-pub const MUTATION_RATE: f64 = 0.001; // mutation rate of the genes (one hexadecimal letter will be changed)
+pub const MUTATION_RATE: f64 = 0.1; // mutation rate of the genes (one hexadecimal letter will be changed)
 
 // neurons settings
 pub const KILLING_ENABLED: bool = false;

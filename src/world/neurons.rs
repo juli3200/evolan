@@ -105,7 +105,9 @@ impl GeneTrait for u32{
 impl GeneTrait for Vec<char> {
     fn decode_gene(&self) -> [u32; 5] {
         // convert the vec<char> in a string
+        println!("hex gene: {:?}", self);
         let string_gene: String = self.into_iter().collect();
+        println!("string gene: {}", string_gene);
         // convert the hex string in a u32 and perform the .decode_gene methode
         u32::from_str_radix(&string_gene, 16).expect("REASON").decode_gene()
 
@@ -150,7 +152,10 @@ pub fn mutate(genome: &mut[u32; super::GENOME_LENGTH], neuron_lib: &Vec<&usize>)
                 // the validaty is checked with the neurons::valid_gene fn
                 // if valid the new_letter is assigned to the *letter
                 true => *letter =   
-                    loop{let new_letter = std::char::from_u32(rng.gen_range(0..16u32)).unwrap();
+                    loop{let l = rng.gen_range(0..16u32);
+                        let new_letter = format!("{:X}", l).chars().next().unwrap();
+                        
+                        println!("{}, {}", new_letter, l);
                         // the new_gene is a copy of the gene
                         let mut new_gene = og_gene.clone();
                         new_gene[c2] = new_letter; // the new letter is changed and checked

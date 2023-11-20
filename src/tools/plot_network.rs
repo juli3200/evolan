@@ -43,7 +43,7 @@ fn write_to_csv(data: &Vec<[u32; 5]>) {
             inner_layer2 => {format!("{}", OUTPUT_NEURON_REGISTER_STRING[row[3] as usize])}
 
         };
-        writeln!(file, "{:?},{:?},{:.4}", source, target, row[4] as f32 / 2_i32.pow(16) as f32 - 4.0).expect("Unable to write data to file");
+        writeln!(file, "{:?},{:?},{:.4}", source, target, row[4] as f32 / 2_i32.pow(15) as f32).expect("Unable to write data to file");
     }
 }
 
