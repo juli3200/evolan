@@ -37,6 +37,7 @@ pub struct Bot{
 impl Bot {
     // the new function creates the Bot without any information except the genome
     // this is because the grid and &world is not known
+    // ✅
     pub fn new(genome: [u32; super::GENOME_LENGTH]) -> Self{
         Bot { x: super::Dow::MAX, 
               y: super::Dow::MAX, 
@@ -48,6 +49,7 @@ impl Bot {
 
     // with the inherit function it's not neccesary to call the new function
     // the genome is provided using the 
+    // todo: check
     pub fn inherit(parents: (Bot, Bot), neuron_lib: &Vec<&usize>) -> Self{
         let mut rng = rand::thread_rng();
 
@@ -76,6 +78,7 @@ impl Bot {
 
     // the spawn function adds further information(coordinates) & is called after the World::new() in the World::spawn
     // for the spawn function either the new or the inherit function have already had to be called 
+    // ✅
     pub fn spawn(& mut self, x:super::Dow, y:super::Dow){
         self.x = x;
         self.y = y;
@@ -115,6 +118,7 @@ impl Bot {
 
     }
 
+    // ✅
     pub fn draw_graph(&self){
         let decoded_genes: Vec<[u32; 5]> = self.genome.map(|gene| gene.decode_gene()).to_vec();
         tools::plot_network::main(&decoded_genes);

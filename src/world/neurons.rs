@@ -33,6 +33,7 @@ output_function::kill
  
  */
 
+ // ✅
 fn create_gene(lib: &Vec<&usize>) -> u32{
     /*
     :return: one gene with 2-type_bits, 5 id bits, 2 type bits, 5 id bits and 18 weight bits in hex format
@@ -67,7 +68,7 @@ fn create_gene(lib: &Vec<&usize>) -> u32{
 
 }
 
-
+// ✅
 pub fn create_genome(neuron_lib: &Vec<&usize>) -> [u32; super::GENOME_LENGTH]{
     let mut gene: [u32; super::GENOME_LENGTH] = [0u32; super::GENOME_LENGTH];
     for g in gene.iter_mut(){
@@ -84,6 +85,7 @@ pub trait GeneTrait{
 }
 
 impl GeneTrait for u32{
+    // ✅
     fn decode_gene(&self) -> [u32; 5]{
         let type_1_mask:u32 = 0b11 << 30;
         let id_1_mask: u32 = 0b11111 << 25;
@@ -103,6 +105,7 @@ impl GeneTrait for u32{
 }
 
 impl GeneTrait for Vec<char> {
+    // ✅
     fn decode_gene(&self) -> [u32; 5] {
         // convert the vec<char> in a string
         let string_gene: String = self.into_iter().collect();
@@ -112,7 +115,7 @@ impl GeneTrait for Vec<char> {
     }
 }
 
-
+// ✅
 pub fn valid_gene(gene: Vec<char>, neuron_lib: &Vec<&usize>)-> bool{
     // checks if mutated gene is valid
 
@@ -130,6 +133,7 @@ pub fn valid_gene(gene: Vec<char>, neuron_lib: &Vec<&usize>)-> bool{
 }
 
 
+// ✅
 pub fn mutate(genome: &mut[u32; super::GENOME_LENGTH], neuron_lib: &Vec<&usize>){
     // mutation
 

@@ -6,7 +6,7 @@ mod tools;
 use world::{objects, neurons, criteria};
 use neurons::GeneTrait;
 
-
+use std::ffi::{CString, CStr};
 
 fn main(){
     let mut main_world: world::World = world::World::new((10, 10), 2);
@@ -25,5 +25,8 @@ fn main(){
     println!("{:08X}",main_world.bot_vec[0].genome[0]);
     neurons::mutate(&mut main_world.bot_vec[0].genome, &main_world.neuron_lib);
     println!("{:08X}",main_world.bot_vec[0].genome[0]);
-    //main_world.bot_vec[0].draw_graph();*/
+    //main_world.bot_vec[0].draw_graph();
+
+    let c_string = CString::new("hello aajshkajshkjas").expect("CString::new failed");
+    unsafe { calculate::calculate(c_string.as_ptr()) };
 }
