@@ -24,16 +24,16 @@ pub fn random(bot: &Bot, world: &World) -> f64{
 }
 
 pub fn population_density(bot: &Bot, world: &World) -> f64{
-    // calculates denity in a certain area
+    // calculates density in a area (search area)
 
     // eg. density size = 10; start at -5 and go to +5
     // go through the grid and check if it host a guest
-    // density counts any Blocks 
+    // density counts any Blocks (solid)
     let mut n_blocks = 0;
-    for y in bot.y as u32-(DENSITY_SIZE/2)..bot.x as u32 + DENSITY_SIZE/2{
+    for y in bot.y as u32-(SEARCH_AREA/2)..bot.x as u32 + SEARCH_AREA/2{
         // check if y is lower than 0 or bigger as dim[1]
         if y > world.dim.1 as u32{continue;}
-        for x in bot.x as u32-(DENSITY_SIZE/2)..bot.x as u32+DENSITY_SIZE/2{
+        for x in bot.x as u32-(SEARCH_AREA/2)..bot.x as u32+SEARCH_AREA/2{
             // check if x is lower than 0 or bigger as dim[0]
             if x > world.dim.0 as u32{continue;}
             match world.grid[y as usize][x as usize].guest {
@@ -45,7 +45,8 @@ pub fn population_density(bot: &Bot, world: &World) -> f64{
     }
 
     // return ratio 
-    (n_blocks / (DENSITY_SIZE.pow(2))) as f64 
+    // as the value is between 0 and 1 0.5 is subtracted allowing negative values
+    (n_blocks / (SEARCH_AREA.pow(2)))  as f64 - 0.5
 }
 
 // how many bots are alive
@@ -69,7 +70,7 @@ pub fn angle(bot: &Bot, world: &World) -> f64{bot.angle as f64}
 // private fn used for all nn functions
 fn nearest_neighbour(bot: &Bot, world: &World) -> (usize, usize){
     // not the true nn is returned, because of efficiency
-    for n in 0..(DENSITY_SIZE/*size of the searched square*//2) as i32{
+    for n in 0..(SEARCH_AREA/*size of the searched square*//2) as i32{
         for y in -n..n{
             for x in -n..n{
                 // check if in grid

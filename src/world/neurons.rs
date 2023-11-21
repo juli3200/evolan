@@ -1,4 +1,4 @@
-use rand::Rng;
+use rand::{Rng, seq::SliceRandom};
 
 pub mod input_functions;
 // the neuron register is used to convert genes to real values
@@ -56,7 +56,7 @@ fn create_gene(lib: &Vec<&usize>) -> u32{
 
     // create type and id for second neuron
     let type_2 = rng.gen_range(0..=(super::INNER_LAYERS)) as u32; // 0 is for 1. layer as described above
-    let id_2 = rng.gen_range(0..(*lib[type_1 as usize + 1])) as u32;
+    let id_2 = rng.gen_range(0..(*lib[type_2 as usize + 1])) as u32;
 
     // weight bits; 18 bits
     let weight = rng.gen_range(0..2u32.pow(18)); // 18 bits long number; is converted to a float between +-4
@@ -105,9 +105,7 @@ impl GeneTrait for u32{
 impl GeneTrait for Vec<char> {
     fn decode_gene(&self) -> [u32; 5] {
         // convert the vec<char> in a string
-        println!("hex gene: {:?}", self);
         let string_gene: String = self.into_iter().collect();
-        println!("string gene: {}", string_gene);
         // convert the hex string in a u32 and perform the .decode_gene methode
         u32::from_str_radix(&string_gene, 16).expect("REASON").decode_gene()
 
@@ -126,7 +124,7 @@ pub fn valid_gene(gene: Vec<char>, neuron_lib: &Vec<&usize>)-> bool{
     else if decoded_gene[1] as usize >= *neuron_lib[decoded_gene[0] as usize]{return false;}
 
     else if (decoded_gene[2]as usize) > super::INNER_LAYERS{return false;}
-    else if decoded_gene[3] as usize >= *neuron_lib[decoded_gene[2] as usize]{return false;}
+    else if decoded_gene[3] as usize >= *neuron_lib[(decoded_gene[2] +1 )as usize]{return false;}
 
     else{true}
 }
@@ -135,30 +133,36 @@ pub fn valid_gene(gene: Vec<char>, neuron_lib: &Vec<&usize>)-> bool{
 pub fn mutate(genome: &mut[u32; super::GENOME_LENGTH], neuron_lib: &Vec<&usize>){
     // mutation
 
-    let mut rng = rand::thread_rng();
+    let hex_letters = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'];
 
+    let mut c1 = 0;
     // c1 is the counter of the outer for loop
     for gene in genome.iter_mut(){
+
+        let mut rng = rand::thread_rng();
         
-        let mut hex_gene: Vec<char> = format!("{:X}", gene).chars().collect(); // convert u32 in hex string
+        println!("{:08X}", gene);
+
+        let mut hex_gene: Vec<char> = format!("{:08X}", gene).chars().collect(); // convert u32 in hex string
+        
         let og_gene = hex_gene.clone();
 
         // go through every letter and change it by chance
         // c2 is the counter of the inner for loop
         let mut c2 = 0;
         for letter in hex_gene.iter_mut(){
+
             match rng.gen_bool(super::MUTATION_RATE) { 
                 // if mutation occurs, the loop searches for a new random valid gene 
                 // the validaty is checked with the neurons::valid_gene fn
                 // if valid the new_letter is assigned to the *letter
                 true => *letter =   
-                    loop{let l = rng.gen_range(0..16u32);
-                        let new_letter = format!("{:X}", l).chars().next().unwrap();
-                        
-                        println!("{}, {}", new_letter, l);
+                    loop{// choose a random char from the hex_letters array
+                        let new_letter = *hex_letters.choose(&mut rng).unwrap();
                         // the new_gene is a copy of the gene
                         let mut new_gene = og_gene.clone();
                         new_gene[c2] = new_letter; // the new letter is changed and checked
+                        
                         match valid_gene(new_gene, neuron_lib){
                             true=>break new_letter,
                             false=> continue
@@ -166,8 +170,17 @@ pub fn mutate(genome: &mut[u32; super::GENOME_LENGTH], neuron_lib: &Vec<&usize>)
                     }, 
                 false => {}
             }
-            c2+=1;
+            c2+=1;    
         }
+        c1+=1;
+        // end of for
+
+        // convert the new gene in a u32
+
+        // convert the vec<char> in a string
+        let string_gene: String = hex_gene.into_iter().collect();
+        // convert the hex string in a u32 and perform the .decode_gene methode
+        *gene = u32::from_str_radix(&string_gene, 16).expect("REASON");
     }
 }
 

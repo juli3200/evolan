@@ -15,13 +15,15 @@ fn main(){
     println!("{:?}", main_world.bot_vec);
 
 
-    let char_gene = vec!['0', 'C', '3', '1', '5', 'A', 'E' ,'6'];
+    let char_gene = vec!['4', '0', '9', 'F', 'A', 'F', '6' ,'3'];
+    
 
+    println!("{:?}\n", neurons::valid_gene(char_gene, &main_world.neuron_lib));
+    
     println!("{:?}", main_world.neuron_lib);
 
-    println!("{:?}", 344448949.decode_gene());
-    println!("{:X}; {:X}", 344448949, main_world.bot_vec[0].genome[0]);
+    println!("{:08X}",main_world.bot_vec[0].genome[0]);
     neurons::mutate(&mut main_world.bot_vec[0].genome, &main_world.neuron_lib);
-    println!("{:X}; {:X}", 344448949, main_world.bot_vec[0].genome[0]);
-    //main_world.bot_vec[0].draw_graph();
+    println!("{:08X}",main_world.bot_vec[0].genome[0]);
+    //main_world.bot_vec[0].draw_graph();*/
 }

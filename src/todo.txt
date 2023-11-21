@@ -1,19 +1,17 @@
 create fn neurons_to_compute in objects.rs
-mutation !!!!!
-test basic functionallities: mutation; neurons_to_compute
+test basic functionallities: neurons_to_compute
 
 to many inner neurons
 
 create the calculate.rs
 
--input neurons:
-    create fn nearest_neighbour(noe default output of (0, 0))
-
 - output neurons
     code output functions and create the library in neurons.rs
+
+create way to store world
 
 create the cuda version and GPU accelerated version
 
 create python ui
-create way to store world
+
 
