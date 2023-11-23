@@ -4,6 +4,7 @@ test basic functionallities: neurons_to_compute
 to many inner neurons
 
 create the calculate.rs
+ask cuda bindings (.lib/.dll)
 
 - output neurons
     code output functions and create the library in neurons.rs

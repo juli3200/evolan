@@ -1,7 +1,7 @@
 #include <iostream>
 
  // nvcc
-void calculate(std::string a){std::cout << a;}
+void calculate(std::int32_t a){std::cout << a;}
 
 int main(){
     std::cout << "Hallloooooo";

@@ -30,7 +30,6 @@ pub struct Bot{
     // genome; hex -> view concept
     pub genome: [u32; super::GENOME_LENGTH],
     
-    pub input: Vec<Vec<[usize; 2]>>
 
 }
 
@@ -43,7 +42,6 @@ impl Bot {
               y: super::Dow::MAX, 
               angle: 0, 
               genome, 
-              input: vec![vec![]]
               }
     }
 
@@ -85,8 +83,8 @@ impl Bot {
         self.neurons_to_compute();
     }
 
-    fn neurons_to_compute(&self){
-        // this function list all 
+    fn neurons_to_compute(&self) -> Vec<[f64;5]>{
+        // this function filters all unused neurons out
         /*
         ///
         /// 
@@ -100,17 +98,26 @@ impl Bot {
          */
         // continue here
 
-        let mut a = Vec::new();
-        a.push(Vec::new());
-        a[0].push([18, 18]);
-        
+        let mut decoded_genome = vec![];
+        for gene in self.genome{
+            let a =gene.decode_gene();
+            let mut fa = [0.0; 5];
+            fa[0] = a[0] as f64;fa[1] = a[1] as f64;fa[2] = a[2] as f64;fa[3] = a[03] as f64;fa[4] = a[4] as f64;
+            decoded_genome.push(fa);
+        }
+
+        let computed_neurons: Vec<_> = vec![1];
+
+        for connection in decoded_genome.iter(){
+            
+        }
+        return decoded_genome
     }
 
-    pub fn calculate_input(&self, world: &super::World)-> Vec<[f64; 2]>{
-        let mut calc_input_vec = vec![];
-        for neuron in self.input[0].iter(){
-            let calculated_input: f64 = super::neurons::INPUT_NEURON_REGISTER[neuron[0]](self, world);
-            calc_input_vec.push([calculated_input, neuron[1] as f64])
+    pub fn calculate_input(&self, world: &super::World)-> Vec<[f64; 5]>{
+        let mut calc_input_vec = self.neurons_to_compute();
+        for neuron in calc_input_vec.iter_mut(){
+            if neuron[0] == 0.0{neuron[0] = super::neurons::INPUT_NEURON_REGISTER[neuron[1] as usize](self, world);}
         }
         
         calc_input_vec
