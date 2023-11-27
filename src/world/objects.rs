@@ -1,7 +1,7 @@
 use rand::Rng;
 use super::ObjectTrait;
 use super::neurons::GeneTrait;
-use crate::tools;
+use crate::{tools, settings};
 
 // impl of ObjectTrait for every Object
 impl ObjectTrait for Bot{
@@ -83,8 +83,8 @@ impl Bot {
         self.neurons_to_compute();
     }
 
-    fn neurons_to_compute(&self) -> Vec<[f64;5]>{
-        // this function filters all unused neurons out
+    pub fn neurons_to_compute(&self) -> Vec<Vec<[f64;5]>>{
+        // this function filters all unused neurons out and sorts them
         /*
         ///
         /// 
@@ -97,13 +97,14 @@ impl Bot {
         
          */
         // continue here
-
-        let mut decoded_genome = vec![];
+        let mut c = 0;
+        let mut decoded_genome = vec![vec![]; settings::INNER_LAYERS+2];
         for gene in self.genome{
             let a =gene.decode_gene();
             let mut fa = [0.0; 5];
-            fa[0] = a[0] as f64;fa[1] = a[1] as f64;fa[2] = a[2] as f64;fa[3] = a[03] as f64;fa[4] = a[4] as f64;
-            decoded_genome.push(fa);
+            fa[0] = 0.0;fa[1] = a[1] as f64;fa[2] = a[2] as f64;fa[3] = a[03] as f64;fa[4] = a[4] as f64;
+            decoded_genome[a[c] as usize].push(fa);
+            c+=1;
         }
 
         let computed_neurons: Vec<_> = vec![1];
@@ -114,12 +115,13 @@ impl Bot {
         return decoded_genome
     }
 
-    pub fn calculate_input(&self, world: &super::World)-> Vec<[f64; 5]>{
+    pub fn calculate_input(&self, world: &super::World)-> Vec<Vec<[f64; 5]>>{
         let mut calc_input_vec = self.neurons_to_compute();
-        for neuron in calc_input_vec.iter_mut(){
-            if neuron[0] == 0.0{neuron[0] = super::neurons::INPUT_NEURON_REGISTER[neuron[1] as usize](self, world);}
+        for neuron in calc_input_vec[0].iter_mut(){
+            neuron[0] = super::neurons::INPUT_NEURON_REGISTER[neuron[1] as usize](self, world)
         }
         
+
         calc_input_vec
 
 

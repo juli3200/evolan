@@ -172,13 +172,20 @@ impl World{
         // for every bot in self.bot_vec 
         // the function bot.neurons_to_comute is called
         // this returns a Vec of vecs(one per bot) of vecs(one per neccesery gene)
-        let input_neurons: Vec<Vec<[f64; 5]>> = self.bot_vec.par_iter()// the process is computed in parrallel with .par_iter() method
+        let input_neurons: Vec<Vec<Vec<[f64; 5]>>> = self.bot_vec.par_iter()// the process is computed in parrallel with .par_iter() method
         .map(|bot: &objects::Bot| bot.calculate_input(/*make &self immutable*/&*self))
         // collect the outputs of all bots in a Vec<Vec<[f64; 2]>>
         .collect::<Vec<_>>();
 
         // pass to calculate.rs
         // todo: create fn in calculate.rs
+        if !crate::settings::GPU{
+            let output = input_neurons.par_iter().
+            map(|bot| crate::calculate::calc_step(bot)).collect::<Vec<_>>();
+        }
+    }
 
+    pub fn store_world(&self, dir: String){
+        
     }
 }

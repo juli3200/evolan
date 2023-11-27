@@ -97,6 +97,7 @@ pub fn distance_nn(bot: &Bot, world: &World) -> f64{
     // calculate and return the distance
     (((coords_nn.0 as i64 - bot.x as i64).pow(2) + 
     (coords_nn.1 as i64- bot.y as i64).pow(2)) as f64).sqrt()
+    
 }
 
 pub fn angle_nn(bot: &Bot, world: &World) -> f64{

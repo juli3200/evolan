@@ -19,3 +19,5 @@ pub const NEURONAL_MUTATION_ENABLED: bool = true; // is the mutation neuron acti
 pub const NEURONAL_MUTATION_RATE: f64 = 0.001;
 pub const SEARCH_AREA: u32 = 20; // how big the area is for the calculation for the density or neaerst neighbour; side length
 
+// performance
+pub const GPU: bool = false;

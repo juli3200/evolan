@@ -25,7 +25,11 @@ fn main(){
 
     println!("{:08X}",main_world.bot_vec[0].genome[0]);
     neurons::mutate(&mut main_world.bot_vec[0].genome, &main_world.neuron_lib);
-    println!("{:08X}",main_world.bot_vec[0].genome[0]);
+    println!("\n{:?}",main_world.bot_vec[0].neurons_to_compute());
+    println!("{:?}", main_world.bot_vec[0].calculate_input(&main_world))
+
+
+
     //main_world.bot_vec[0].draw_graph();
 
 }
