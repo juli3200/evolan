@@ -56,7 +56,12 @@ fn create_gene(lib: &Vec<&usize>) -> u32{
     let id_1 = rng.gen_range(0..*lib[type_1 as usize]) as u32;
 
     // create type and id for second neuron
-    let type_2 = rng.gen_range(0..=(super::INNER_LAYERS)) as u32; // 0 is for 1. layer as described above
+    // if bakwards connections enabled random else must be bigger then type 1
+    let start_val = match crate::settings::BACKWARDS_ENABLED{
+        true => 0,
+        false => type_1
+    };
+    let type_2 = rng.gen_range(start_val as usize..=(super::INNER_LAYERS)) as u32; // 0 is for 1. layer as described above
     let id_2 = rng.gen_range(0..(*lib[type_2 as usize + 1])) as u32;
 
     // weight bits; 18 bits

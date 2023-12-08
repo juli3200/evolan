@@ -80,7 +80,6 @@ impl Bot {
     pub fn spawn(& mut self, x:super::Dow, y:super::Dow){
         self.x = x;
         self.y = y;
-        self.neurons_to_compute();
     }
 
     pub fn neurons_to_compute(&self) -> Vec<Vec<[f64;5]>>{
@@ -97,20 +96,24 @@ impl Bot {
         
          */
         // continue here
-        let mut c = 0;
-        let mut decoded_genome = vec![vec![]; settings::INNER_LAYERS+2];
+        let mut decoded_genome = vec![vec![]; settings::INNER_LAYERS+1];
         for gene in self.genome{
             let a =gene.decode_gene();
             let mut fa = [0.0; 5];
-            fa[0] = 0.0;fa[1] = a[1] as f64;fa[2] = a[2] as f64;fa[3] = a[03] as f64;fa[4] = a[4] as f64;
-            decoded_genome[a[c] as usize].push(fa);
-            c+=1;
+            fa[0] = 0.0;fa[1] = a[1] as f64;fa[2] = a[2] as f64 + 1.0;fa[3] = a[03] as f64;fa[4] = a[4] as f64;
+            decoded_genome[a[0] as usize].push(fa);
+            
         }
 
         let computed_neurons: Vec<_> = vec![1];
-
-        for connection in decoded_genome.iter(){
-            
+        
+        let mut layer_c = 0;
+        for layer in decoded_genome.iter(){
+            let mut connection_c = 0;
+            for connection in layer{
+                connection_c+=1;
+            }
+            layer_c+=1;
         }
         return decoded_genome
     }

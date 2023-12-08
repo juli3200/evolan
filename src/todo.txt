@@ -1,7 +1,9 @@
 create fn neurons_to_compute in objects.rs
-test basic functionallities: neurons_to_compute
 
 to many inner neurons
+
+modified sigmoid over input fn: 2*sigmoid(x)-1
+backwarrds connections enable
 
 create the calculate.rs
 ask cuda bindings (.lib/.dll)

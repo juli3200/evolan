@@ -35,12 +35,14 @@ fn write_to_csv(data: &Vec<[u32; 5]>) {
     for row in data {
         let source = match row[0] {
           0 => {format!("{}", INPUT_NEURON_REGISTER_STRING[row[1] as usize])},
-          _=>{format!("inner_neuron{}_{}", row[0], row[1])}
+          _=>{format!("inner_neuron{}_{}", row[0] , row[1])}
         };
-        let inner_layer2 = crate::settings::INNER_LAYERS +1;
-        let target = match (row[2]+1) as usize{
-            1..=crate::settings::INNER_LAYERS => {format!("inner_neuron{}_{}", row[2], row[3])},
-            inner_layer2 => {format!("{}", OUTPUT_NEURON_REGISTER_STRING[row[3] as usize])}
+        let inner_layer2 = crate::settings::INNER_LAYERS - 1;
+        println!("{}, {}", inner_layer2,row[2]);
+        let target = match row[2] as usize{
+            crate::settings::INNER_LAYERS => {format!("{}", OUTPUT_NEURON_REGISTER_STRING[row[3] as usize])}
+            _ => {format!("inner_neuron{}_{}", row[2]+1, row[3])},
+            
 
         };
         writeln!(file, "{:?},{:?},{:.4}", source, target, row[4] as f32 / 2_i32.pow(15) as f32).expect("Unable to write data to file");

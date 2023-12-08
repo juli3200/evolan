@@ -30,19 +30,27 @@ pub fn population_density(bot: &Bot, world: &World) -> f64{
     // go through the grid and check if it host a guest
     // density counts any Blocks (solid)
     let mut n_blocks = 0;
-    for y in bot.y as u32-(SEARCH_AREA/2)..bot.x as u32 + SEARCH_AREA/2{
-        // check if y is lower than 0 or bigger as dim[1]
-        if y > world.dim.1 as u32{continue;}
-        for x in bot.x as u32-(SEARCH_AREA/2)..bot.x as u32+SEARCH_AREA/2{
-            // check if x is lower than 0 or bigger as dim[0]
-            if x > world.dim.0 as u32{continue;}
+    
+    // Calculate lower and upper bounds for y to prevent overflow
+    let lower_y_bound = (SEARCH_AREA / 2).saturating_sub(bot.y as u32);  // Lower y bound ensuring it doesn't underflow
+    let upper_y_bound = (bot.y as u32 + SEARCH_AREA / 2).min(world.dim.1 as u32);  // Upper y bound limited by world dimensions
+
+    // Iterate within the y bounds
+    for y in lower_y_bound..upper_y_bound {
+        // Calculate lower and upper bounds for x to prevent overflow
+        let lower_x_bound = (SEARCH_AREA / 2).saturating_sub(bot.x as u32);  // Lower x bound ensuring it doesn't underflow
+        let upper_x_bound = (bot.x as u32 + SEARCH_AREA / 2).min(world.dim.0 as u32);  // Upper x bound limited by world dimensions
+
+        // Iterate within the x bounds
+        for x in lower_x_bound..upper_x_bound {
+            // Check for guests in the grid
             match world.grid[y as usize][x as usize].guest {
-                // if it hosts guets n_blocks += 1
-                Some(_) => {n_blocks+=1;}
+                Some(_) => {n_blocks += 1;}
                 None => {continue;}
             }
         }
     }
+
 
     // return ratio 
     // as the value is between 0 and 1 0.5 is subtracted allowing negative values
@@ -128,18 +136,23 @@ pub fn distance_west_east(bot: &Bot, world: &World) -> f64{
 // 0 fw; 1 left 2 bw 3 right -1 none
 pub fn blocked_angle(bot: &Bot, world: &World) -> f64{
     // every coordinate whitch needs to be checked
-    let coords = vec![(bot.x+1, bot.y), (bot.x, bot.y+1), 
-    (bot.x-1, bot.y), (bot.x-1, bot.y)];
+    let coords = vec![(bot.x as i32+1, bot.y as i32), (bot.x as i32, bot.y as i32+1), 
+    (bot.x as i32-1, bot.y as i32), (bot.x as i32-1, bot.y as i32)];
 
-    // go through them and check if guet is some; first is returned
+    // Go through them and check if there's a guest; return the count if found
     let mut c: f64 = 0.0;
-    for coord in coords.into_iter(){
-        match world.grid[coord.1 as usize][coord.0 as usize].guest {
-            Some(_) => {return c}
-            None => {c+=1.0;}
+    for coord in coords.into_iter() {
+        // Ensure the coordinate is within the grid bounds before accessing it
+        if coord.1 >= 0 && coord.1 < world.grid.len() as i32 &&
+        coord.0 >= 0 && coord.0 < world.grid[0].len() as i32 {
+            match world.grid[coord.1 as usize][coord.0 as usize].guest {
+                Some(_) => return c,
+                None => c += 1.0,
+            }
         }
     }
     -1_f64
+
 }
 
 
