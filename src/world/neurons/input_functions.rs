@@ -11,11 +11,11 @@ use std::collections::HashMap;
 
 
 // every function takes &world / &bot as argument even if it isn't used
-pub fn always_true(bot: &Bot, world: &World) -> f64{1.0}
-pub fn always_false(bot: &Bot, world: &World) -> f64{-1.0}
+pub fn always_true(bot: &Bot, world: &World) -> f64{1.0} //0
+pub fn always_false(bot: &Bot, world: &World) -> f64{-1.0} //1
 
 // random input (-1 or 1)
-pub fn random(bot: &Bot, world: &World) -> f64{
+pub fn random(bot: &Bot, world: &World) -> f64{ // 2
     let mut rng = rand::thread_rng();
     match rng.gen_bool(0.5) {
         true => {1.0}
@@ -23,7 +23,7 @@ pub fn random(bot: &Bot, world: &World) -> f64{
     }
 }
 
-pub fn population_density(bot: &Bot, world: &World) -> f64{
+pub fn population_density(bot: &Bot, world: &World) -> f64{ // 3
     // calculates density in a area (search area)
 
     // eg. density size = 10; start at -5 and go to +5
@@ -53,30 +53,30 @@ pub fn population_density(bot: &Bot, world: &World) -> f64{
 
 
     // return ratio 
-    // as the value is between 0 and 1 0.5 is subtracted allowing negative values
-    (n_blocks / (SEARCH_AREA.pow(2)))  as f64 - 0.5
+    // as the value is between 0 and 1 1 is subtracted allowing negative values
+    (n_blocks / (SEARCH_AREA.pow(2)))  as f64 * 2.0 - 1.0
 }
 
 // how many bots are alive
-pub fn population_size(bot: &Bot, world: &World) -> f64{world.bots_alive as f64}
+pub fn population_size(bot: &Bot, world: &World) -> f64{(world.bots_alive  as f64/ world.n_of_bots as f64) *2.0 -1.0} // 4
 
 // every age is identical; stored in world
-pub fn age(bot: &Bot, world: &World) -> f64{world.age_of_gen as f64}
+pub fn age(bot: &Bot, world: &World) -> f64{(world.age_of_gen as f64/ GENERATION_STEPS as f64) * 2.0 -1.0} // 5
 
 //time of the world
-pub fn time(bot: &Bot, world: &World) -> f64{world.time as f64}
+pub fn time(bot: &Bot, world: &World) -> f64{world.time as f64} // 6
 
 // x coord
-pub fn x(bot: &Bot, world: &World) -> f64{bot.x as f64}
+pub fn x(bot: &Bot, world: &World) -> f64{(bot.x as f64/ world.dim.0 as f64) * 2.0 -1.0} // 7
 
 // y coord
-pub fn y(bot: &Bot, world: &World) -> f64{bot.y as f64}
+pub fn y(bot: &Bot, world: &World) -> f64{(bot.y as f64/ world.dim.1 as f64) * 2.0 -1.0}  // 8
 
 // angle of bot
-pub fn angle(bot: &Bot, world: &World) -> f64{bot.angle as f64}
+pub fn angle(bot: &Bot, world: &World) -> f64{bot.angle as f64} // 9
 
 // private fn used for all nn functions
-fn nearest_neighbour(bot: &Bot, world: &World) -> (usize, usize){
+fn nearest_neighbour(bot: &Bot, world: &World) -> Option<(usize, usize)>{
     // not the true nn is returned, because of efficiency
     for n in 0..(SEARCH_AREA/*size of the searched square*//2) as i32{
         for y in -n..n{
@@ -86,55 +86,71 @@ fn nearest_neighbour(bot: &Bot, world: &World) -> (usize, usize){
                 else if y < 0 || y>world.dim.1 as i32 {continue;}
 
                 match world.grid[y as usize][x as usize].guest{
-                    Some(_) => {return (x as usize, y as usize)},
+                    Some(_) => {return Some((x as usize, y as usize))},
                     None => {continue;}
                 }
             }
         }
     }
     
-    // if none is found (0,0) is returned
-    (0, 0)
+    // if none is found None is returned
+    None
 }
 
 // distance to nearest neighbour
-pub fn distance_nn(bot: &Bot, world: &World) -> f64{
+pub fn distance_nn(bot: &Bot, world: &World) -> f64{ // 10
     // get the coords of the nn
     let coords_nn = nearest_neighbour(bot, world);
 
-    // calculate and return the distance
-    (((coords_nn.0 as i64 - bot.x as i64).pow(2) + 
-    (coords_nn.1 as i64- bot.y as i64).pow(2)) as f64).sqrt()
+    return match coords_nn {
+        Some(coords) => // calculate and return the distance
+            {
+                (((coords.0 as i64 - bot.x as i64).pow(2) +
+                    (coords.1 as i64 - bot.y as i64).pow(2)) as f64).sqrt()
+            }
+        None => -1.0
+    }
+
     
 }
 
-pub fn angle_nn(bot: &Bot, world: &World) -> f64{
+pub fn angle_nn(bot: &Bot, world: &World) -> f64{ // 11
+    /*
     let coords_nn = nearest_neighbour(bot, world);
-    // calc the ratio of the triangle between the points
-    let ratio: f64 = (coords_nn.0 as f64 - bot.x as f64) / (coords_nn.1 as f64 - bot.y as f64);
-    // return the arctangens
-    ratio.atan()
+    return match coords_nn {
+        Some(coords) => {
+            // calc the ratio of the triangle between the points
+            let sides = ((coords.0 as f64 - bot.x as f64) , (coords.1 as f64 - bot.y as f64));
+            let ratio: f64 = sides.0.min(sides.1) / sides.0.max(sides.1);
+            println!("ratio: {}", ratio);
+            // return the arc tangent
+            ratio.atan()
+    }
+        None => 0.0
+    }*/
+    0.0
+
 }
 
-pub fn distance_nearest_boarder(bot: &Bot, world: &World) -> f64{
+pub fn distance_nearest_boarder(bot: &Bot, world: &World) -> f64{  // 12
     // create a vec and evaluate the min
     let lv = *vec![bot.x, bot.y, world.dim.0-bot.x, world.dim.1-bot.y].iter().min().unwrap();
     lv as f64
 }
 
 // relation between northh south -> north 0; south -> 1
-pub fn distance_north_south(bot: &Bot, world: &World) -> f64{
+pub fn distance_north_south(bot: &Bot, world: &World) -> f64{ // 13
     // should not divide by zero
     bot.y as f64/(world.dim.1 as f64 -bot.y as f64)
 }
 
 // relation between west east
-pub fn distance_west_east(bot: &Bot, world: &World) -> f64{
+pub fn distance_west_east(bot: &Bot, world: &World) -> f64{ // 14
     bot.x as f64/(world.dim.0 as f64 -bot.x as f64)
 }
 
 // 0 fw; 1 left 2 bw 3 right -1 none
-pub fn blocked_angle(bot: &Bot, world: &World) -> f64{
+pub fn blocked_angle(bot: &Bot, world: &World) -> f64{ // 15
     // every coordinate whitch needs to be checked
     let coords = vec![(bot.x as i32+1, bot.y as i32), (bot.x as i32, bot.y as i32+1), 
     (bot.x as i32-1, bot.y as i32), (bot.x as i32-1, bot.y as i32)];
@@ -157,7 +173,7 @@ pub fn blocked_angle(bot: &Bot, world: &World) -> f64{
 
 
 // if block in an angle hosts a guest
-pub fn blocked_around(bot: &Bot, world: &World) -> f64{
+pub fn blocked_around(bot: &Bot, world: &World) -> f64{ // 16
     match blocked_angle(bot, world) as i64{
         0..=3 => {1f64}
         -1 => {-1f64}
@@ -166,10 +182,10 @@ pub fn blocked_around(bot: &Bot, world: &World) -> f64{
 }
 
 // sums  up all letters and returns ceiled average
-pub fn average_letter(bot: &Bot, world: &World) -> f64{
+pub fn average_letter(bot: &Bot, world: &World) -> f64{ // 17
     let letters = &world.grid[bot.y as usize][bot.x as usize].letters;
     let sum = world.grid[bot.y as usize][bot.x as usize].letters.iter().sum::<u8>() as f64;
-    sum / letters.len() as f64
+    sum / (letters.len() as f64 + 0.1)
 }
 
 // most common letter

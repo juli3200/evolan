@@ -100,13 +100,15 @@ impl Bot {
         for gene in self.genome{
             let a =gene.decode_gene();
             let mut fa = [0.0; 5];
-            fa[0] = 0.0;fa[1] = a[1] as f64;fa[2] = a[2] as f64 + 1.0;fa[3] = a[03] as f64;fa[4] = a[4] as f64;
+            fa[0] = 0.0;
+            fa[1] = a[1] as f64;fa[2] = a[2] as f64 + 1.0;fa[3] = a[3] as f64;fa[4] = a[4] as f64;
             decoded_genome[a[0] as usize].push(fa);
+
             
         }
-
+         
         let computed_neurons: Vec<_> = vec![1];
-        
+        /* 
         let mut layer_c = 0;
         for layer in decoded_genome.iter(){
             let mut connection_c = 0;
@@ -114,7 +116,7 @@ impl Bot {
                 connection_c+=1;
             }
             layer_c+=1;
-        }
+        }*/
         return decoded_genome
     }
 

@@ -36,7 +36,6 @@ pub struct World{
 
     // generation of the world
     generation: usize,
-    generation_time: u16, // how long a generation is alive
     time: u64, // time overall; 
     age_of_gen: u16,
     bots_alive: u16, 
@@ -108,7 +107,6 @@ impl World{
         World { dim,
                 n_of_bots,
                 generation: 0,
-                generation_time:0,
                 time: 0,
                 age_of_gen: 0,
                 bots_alive: 0,
@@ -168,7 +166,7 @@ impl World{
 
     }
 
-    pub fn calculate_output(&mut self){
+    pub fn calculate_step(&mut self){
         // for every bot in self.bot_vec 
         // the function bot.neurons_to_comute is called
         // this returns a Vec of vecs(one per bot) of vecs(one per neccesery gene)
@@ -184,6 +182,7 @@ impl World{
             // returns a vec of vec(bot) of output neurons
             let output = input_neurons.par_iter().
             map(|bot| crate::calculate::calc_step(bot)).collect::<Vec<_>>();
+            println!("{:?}", output);
         }
     }
 

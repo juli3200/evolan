@@ -38,7 +38,7 @@ fn write_to_csv(data: &Vec<[u32; 5]>) {
           _=>{format!("inner_neuron{}_{}", row[0] , row[1])}
         };
         let inner_layer2 = crate::settings::INNER_LAYERS - 1;
-        println!("{}, {}", inner_layer2,row[2]);
+
         let target = match row[2] as usize{
             crate::settings::INNER_LAYERS => {format!("{}", OUTPUT_NEURON_REGISTER_STRING[row[3] as usize])}
             _ => {format!("inner_neuron{}_{}", row[2]+1, row[3])},
