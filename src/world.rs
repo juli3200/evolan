@@ -178,12 +178,28 @@ impl World{
 
         // pass to calculate.rs
         // todo: create fn in calculate.rs
+        let mut output: Vec<Vec<usize>>  = vec![];
         if !crate::settings::GPU{
             // returns a vec of vec(bot) of output neurons
-            let output = input_neurons.par_iter().
+            output = input_neurons.par_iter().
             map(|bot| crate::calculate::calc_step(bot)).collect::<Vec<_>>();
             println!("{:?}", output);
         }
+        
+        //  pass to bot.react(vec<usize>)
+        // copy bot vec
+        let mut bot_vec_copy = self.bot_vec.clone();
+
+        // edit bot vec
+        for (index, bot) in bot_vec_copy.iter_mut().enumerate() {
+            bot.react(self, &output[index]);
+        }
+
+        // replace bot vec with edited vec
+        self.bot_vec = bot_vec_copy;
+
+        
+        
     }
 
     pub fn store_world(&self, dir: String){

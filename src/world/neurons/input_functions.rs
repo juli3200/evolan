@@ -73,7 +73,7 @@ pub fn x(bot: &Bot, world: &World) -> f64{(bot.x as f64/ world.dim.0 as f64) * 2
 pub fn y(bot: &Bot, world: &World) -> f64{(bot.y as f64/ world.dim.1 as f64) * 2.0 -1.0}  // 8
 
 // angle of bot
-pub fn angle(bot: &Bot, world: &World) -> f64{bot.angle as f64} // 9
+pub fn angle(bot: &Bot, world: &World) -> f64{(bot.angle as f64)/ 2.0 - 1.0} // 9
 
 // private fn used for all nn functions
 fn nearest_neighbour(bot: &Bot, world: &World) -> Option<(usize, usize)>{
@@ -181,6 +181,8 @@ pub fn blocked_around(bot: &Bot, world: &World) -> f64{ // 16
     }
 }
 
+
+/* 
 // sums  up all letters and returns ceiled average
 pub fn average_letter(bot: &Bot, world: &World) -> f64{ // 17
     let letters = &world.grid[bot.y as usize][bot.x as usize].letters;
@@ -210,4 +212,4 @@ pub fn mode_letter(bot: &Bot, world: &World) -> f64{
 pub fn length_letter(bot: &Bot, world: &World) -> f64{
     world.grid[bot.y as usize][bot.x as usize].letters.len() as f64
 }
-
+*/

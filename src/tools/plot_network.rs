@@ -14,14 +14,20 @@ const INPUT_NEURON_REGISTER_STRING: [&str; crate::settings::INPUT_NEURONS as usi
     "input_functions::y", "input_functions::distance_nn", "input_functions::angle_nn",
     "input_functions::distance_nearest_boarder", "input_functions::distance_north_south",
     "input_functions::distance_west_east", "input_functions::blocked_angle",
-    "input_functions::blocked_around", "input_functions::average_letter", 
-    "input_functions::mode_letter", "input_functions::length_letter"];
+    "input_functions::blocked_around"/* , "input_functions::average_letter", 
+    "input_functions::mode_letter", "input_functions::length_letter"*/];
 
-const OUTPUT_NEURON_REGISTER_STRING: [&str; crate::settings::OUTPUT_NEURONS as usize] =[
-        "output_function::turn_right","output_function::turn_left","output_function::move_straight",
-        "output_function::move_sideways","output_function::move_x","output_function::move_y",
-        "output_function::move_random","output_function::send_comm","output_function::place_barrier_block",
-        "output_function::mutate","output_function::modify","output_function::kill"];
+const OUTPUT_NEURON_REGISTER_STRING: [&str; crate::settings::OUTPUT_NEURONS as usize] =[ "output_functions::turn_left",
+"output_functions::turn_right",
+"output_functions::move_fw",
+"output_functions::move_left",
+"output_functions::move_right",
+"output_functions::pos_x",
+"output_functions::neg_x",
+"output_functions::pos_y",
+"output_functions::neg_y",
+"output_functions::place_barrier_block",
+"output_functions::mutate"];
 
 
 fn write_to_csv(data: &Vec<[u32; 5]>) {

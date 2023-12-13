@@ -29,6 +29,7 @@ pub struct Bot{
 
     // genome; hex -> view concept
     pub genome: [u32; super::GENOME_LENGTH],
+
     
 
 }
@@ -41,7 +42,7 @@ impl Bot {
         Bot { x: super::Dow::MAX, 
               y: super::Dow::MAX, 
               angle: 0, 
-              genome, 
+              genome
               }
     }
 
@@ -130,6 +131,12 @@ impl Bot {
         calc_input_vec
 
 
+    }
+
+    pub fn react(&mut self, world: &mut super::World, output: &Vec<usize>){
+        for neuron in output{
+            
+        }
     }
 
     // ✅

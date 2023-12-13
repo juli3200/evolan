@@ -1,11 +1,11 @@
 create fn neurons_to_compute in objects.rs
 
 to many inner neurons
+angle nn fix
 
-modified sigmoid over input fn: 2*sigmoid(x)-1
-backwarrds connections enable
+backwards connections enable
 
-create the calculate.rs
+
 ask cuda bindings (.lib/.dll)
 
 - output neurons
