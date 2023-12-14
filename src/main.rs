@@ -10,7 +10,7 @@ use neurons::GeneTrait;
 use std::ffi::{CString, CStr};
 
 fn main(){
-    let mut main_world: world::World = world::World::new((10, 10), 2);
+    let mut main_world: world::World = world::World::new((10, 10), 2, criteria::Criteria::Area([(0,5), (5, 5)]));
 
     main_world.spawn_bots();
     println!("{:?}", main_world.bot_vec);

@@ -55,7 +55,9 @@ pub struct World{
     // grid with coordinates of object
     grid: Vec<Vec<objects::Block>>,
 
-    pub neuron_lib: Vec<&'static usize>
+    pub neuron_lib: Vec<&'static usize>,
+
+    grid_store: Vec<Vec<Vec<u8>>>
 
     //
     // maybe add a vec of all generations
@@ -122,7 +124,8 @@ impl World{
                 bot_vec,
                 barrier_block_vec: vec![],
                 grid,
-                neuron_lib,}
+                neuron_lib,
+                grid_store: vec![], }
     }
 
     pub fn spawn_barrier_blocks(&mut self, barrier_blocks_pos: Vec<(Dow, Dow)>){
@@ -205,8 +208,29 @@ impl World{
         }
 
         // replace bot vec with edited vec
+
+        ///
+        /// 
+        /// 
+        /// continue making the vec 
+        /// 0 => empty
+        /// 1 => Bot
+        /// 2 => BarrierBlock
+        /// push the picture vec in the grid_store
+        /// the add parameter outputfolder
+        /// make every generation a json file and continue with ui
+        /// 
+        /// 
         self.bot_vec = bot_vec_copy;
         self.age_of_gen += 1;
+        let mut picture_vec = vec![vec![0u8; self.dim.0 as usize]; self.dim.1 as usize];
+        for (y,row) in self.grid.iter().enumerate(){
+            for (x, block) in row.iter().enumerate(){
+                match block.guest{
+                    Some(b) => 
+                }
+            }
+        }
 
         
         
@@ -229,6 +253,9 @@ impl World{
         for _ in 0..crate::settings::GENERATION_STEPS{
             self.calculate_step();
         }
+
+        self.store_generation();
+
         self.age_of_gen = 0;
         self.generation += 1;
 
@@ -238,7 +265,7 @@ impl World{
 
     }
 
-    pub fn store_world(&self, dir: String){
+    pub fn store_generation(&self){
         
     }
 }
