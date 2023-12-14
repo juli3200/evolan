@@ -10,15 +10,19 @@ pub mod criteria;
 // constants
 use crate::settings::*;
 
-
+pub enum ObjectsEnum{
+    Bot(*const objects::Bot),
+    BarrierBlock(*const objects::BarrierBlock)
+}
 
 // trait for all Objects
 pub trait ObjectTrait{
     // pos fn for every object
     fn pos(&self)->(Dow, Dow);
+    fn kind(&self) -> ObjectsEnum;
 }
 
-impl std::fmt::Debug for dyn ObjectTrait{
+impl std::fmt::Debug  for dyn ObjectTrait{
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result{
         write!(f, "{:?}", self.pos())
     }
@@ -197,9 +201,23 @@ impl World{
 
         // replace bot vec with edited vec
         self.bot_vec = bot_vec_copy;
+        self.time += 1;
 
         
         
+    }
+
+    fn select(&mut self){
+        
+    }
+
+    pub fn calculate_generation(&mut self){
+        for _ in 0..crate::settings::GENERATION_STEPS{
+            self.calculate_step();
+        }
+
+        self.select()
+
     }
 
     pub fn store_world(&self, dir: String){

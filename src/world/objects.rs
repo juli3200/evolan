@@ -6,9 +6,17 @@ use crate::{tools, settings};
 // impl of ObjectTrait for every Object
 impl ObjectTrait for Bot{
     fn pos(&self)->(super::Dow, super::Dow) {(self.x, self.y)}
+    fn kind(&self) -> super::ObjectsEnum {
+        let raw_bot_pointer: *const Bot = self;
+        super::ObjectsEnum::Bot(raw_bot_pointer)
+    }
 }
 impl ObjectTrait for BarrierBlock{
     fn pos(&self)->(super::Dow, super::Dow) {(self.x, self.y)}
+    fn kind(&self) -> super::ObjectsEnum {
+        let raw_bb_pointer: *const BarrierBlock = self;
+        super::ObjectsEnum::BarrierBlock(raw_bb_pointer)
+    }
 }
 
 
@@ -49,7 +57,7 @@ impl Bot {
     // with the inherit function it's not neccesary to call the new function
     // the genome is provided using the 
     // todo: check
-    pub fn inherit(parents: (Bot, Bot), neuron_lib: &Vec<&usize>) -> Self{
+    pub fn inherit(parents: (&Bot, &Bot), neuron_lib: &Vec<&usize>) -> Self{
         let mut rng = rand::thread_rng();
 
         // create a genome with zeros
@@ -73,6 +81,17 @@ impl Bot {
         Self::new(genome)
 
 
+    }
+
+    // new bot is created as a clone of the old one with mutation
+    pub fn clone(parent: &Bot,  neuron_lib: &Vec<&usize>) -> Self{
+        let mut genome = parent.genome.clone();
+        
+        if super::MUTATION_ENABLED{
+            super::neurons::mutate(&mut genome, neuron_lib);
+        }
+
+        Self::new(genome)
     }
 
     // the spawn function adds further information(coordinates) & is called after the World::new() in the World::spawn
@@ -124,7 +143,7 @@ impl Bot {
     pub fn calculate_input(&self, world: &super::World)-> Vec<Vec<[f64; 5]>>{
         let mut calc_input_vec = self.neurons_to_compute();
         for neuron in calc_input_vec[0].iter_mut(){
-            neuron[0] = super::neurons::INPUT_NEURON_REGISTER[neuron[1] as usize](self, world)
+            neuron[0] = super::neurons::INPUT_NEURON_REGISTER[neuron[1] as usize](self, world);
         }
         
 
@@ -135,7 +154,7 @@ impl Bot {
 
     pub fn react(&mut self, world: &mut super::World, output: &Vec<usize>){
         for neuron in output{
-            
+            super::neurons::OUTPUT_NEURON_REGISTER[*neuron](self, world);
         }
     }
 
