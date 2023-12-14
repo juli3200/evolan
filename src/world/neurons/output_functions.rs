@@ -17,7 +17,7 @@ pub fn turn_right(bot: &mut Bot, world: &mut World){
 }
 
 fn check_block(world: &mut World, new_coords: &(isize, isize)) -> bool{
-    if (0< new_coords.0 &&  new_coords.0 < world.dim.0 as isize) && (0< new_coords.1 && new_coords.1 < world.dim.1 as isize){
+    if (new_coords.0 >= 0 &&  new_coords.0 < world.dim.0 as isize) && (new_coords.1 >= 0 && new_coords.1 < world.dim.1 as isize){
         return match world.grid[new_coords.1 as usize][new_coords.0 as usize].guest {
             None => true, 
             Some(_) => false
@@ -125,7 +125,7 @@ pub fn neg_y(bot: &mut Bot, world: &mut World){
 pub fn place_barrier_block(bot: &mut Bot, world: &mut World){
     
     let mut rng = rand::thread_rng();
-    if rng.gen_bool(BARRIER_BLOCK_BLOCKADE){return;}
+    if !rng.gen_bool(BARRIER_BLOCK_BLOCKADE){return;}
 
     let mut new_coords = (bot.x.clone() as isize, bot.y.clone() as isize);
     match bot.angle {

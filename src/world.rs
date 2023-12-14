@@ -10,6 +10,7 @@ pub mod criteria;
 // constants
 use crate::settings::*;
 
+
 pub enum ObjectsEnum{
     Bot(*const objects::Bot),
     BarrierBlock(*const objects::BarrierBlock)
@@ -37,6 +38,9 @@ pub struct World{
 
     //number of bots
     n_of_bots: u16,
+
+    // selection criteria can be found in criteria.rs
+    selection_criteria: criteria::Criteria,
 
     // generation of the world
     generation: usize,
@@ -74,7 +78,7 @@ impl std::fmt::Display for World{
 }
 
 impl World{
-    pub fn new(dim: (Dow, Dow), n_of_bots: u16) -> Self {
+    pub fn new(dim: (Dow, Dow), n_of_bots: u16, selection_criteria: criteria::Criteria) -> Self {
 
         // checking input
         if dim.0 == Dow::MAX || dim.1 == Dow::MAX{panic!("dim.0/dim.1 must be smaller than Dow::Max; buffer needed")}
@@ -110,6 +114,7 @@ impl World{
 
         World { dim,
                 n_of_bots,
+                selection_criteria,
                 generation: 0,
                 time: 0,
                 age_of_gen: 0,
@@ -129,7 +134,7 @@ impl World{
         }
 
         for coord in barrier_blocks_pos.into_iter() {
-            let index = self.barrier_block_vec.len()-1;
+            let index = self.barrier_block_vec.len();
 
             self.barrier_block_vec.push(objects::BarrierBlock::new(coord.0, coord.1)); // create new barrier block
 
@@ -154,7 +159,7 @@ impl World{
                 // check coords
                 match self.grid[y][x].guest{
                     None => {break (x, y);}
-                    Some(t) =>{continue;}
+                    Some(_) =>{continue;}
                 }
             };
 
@@ -201,22 +206,35 @@ impl World{
 
         // replace bot vec with edited vec
         self.bot_vec = bot_vec_copy;
-        self.time += 1;
+        self.age_of_gen += 1;
 
         
         
     }
 
     fn select(&mut self){
-        
+        let selected_bot_vec = self.selection_criteria.select(self);
+        let mut new_bot_vec: Vec<objects::Bot> = vec![];
+
+        for i in 0..self.n_of_bots{
+            let mut new_bot = objects::Bot::clone_(unsafe{&*selected_bot_vec[i as usize%selected_bot_vec.len()]}, & self.neuron_lib);
+            new_bot_vec.push(new_bot);
+        }
+
+        self.bot_vec = new_bot_vec;
+
     }
 
     pub fn calculate_generation(&mut self){
         for _ in 0..crate::settings::GENERATION_STEPS{
             self.calculate_step();
         }
+        self.age_of_gen = 0;
+        self.generation += 1;
 
-        self.select()
+        self.select();
+
+        self.spawn_bots();
 
     }
 

@@ -3,7 +3,8 @@ use crate::settings::KILLING_ENABLED;
 use super::{World, ObjectTrait, ObjectsEnum};
 use super::objects::Bot;
 
-enum Criteria{
+#[derive(Debug)]
+pub enum Criteria{
     // survive by beeing in certain Area
     Area([(super::Dow, super::Dow); 2])
 }

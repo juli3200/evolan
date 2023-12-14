@@ -84,7 +84,7 @@ impl Bot {
     }
 
     // new bot is created as a clone of the old one with mutation
-    pub fn clone(parent: &Bot,  neuron_lib: &Vec<&usize>) -> Self{
+    pub fn clone_(parent: &Bot,  neuron_lib: &Vec<&usize>) -> Self{
         let mut genome = parent.genome.clone();
         
         if super::MUTATION_ENABLED{
