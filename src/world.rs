@@ -8,7 +8,7 @@ pub mod neurons;
 pub mod criteria;
 
 // constants
-use crate::settings::*;
+use crate::{settings::*, tools};
 
 
 pub enum ObjectsEnum{
@@ -34,7 +34,7 @@ impl std::fmt::Debug  for dyn ObjectTrait{
 #[derive(Debug)]
 pub struct World{
     //setting dimension of the world; (u8, u8)
-    dim: (Dow, Dow),
+    pub dim: (Dow, Dow),
 
     //number of bots
     n_of_bots: u16,
@@ -42,8 +42,11 @@ pub struct World{
     // selection criteria can be found in criteria.rs
     selection_criteria: criteria::Criteria,
 
+    // output path
+    pub path: String,
+
     // generation of the world
-    generation: usize,
+    pub generation: usize,
     time: u64, // time overall; 
     age_of_gen: u16,
     bots_alive: u16, 
@@ -53,11 +56,11 @@ pub struct World{
     barrier_block_vec: Vec<objects::BarrierBlock>,
 
     // grid with coordinates of object
-    grid: Vec<Vec<objects::Block>>,
+    pub grid: Vec<Vec<objects::Block>>,
 
     pub neuron_lib: Vec<&'static usize>,
 
-    grid_store: Vec<Vec<Vec<u8>>>
+    pub grid_store: Vec<Vec<Vec<tools::store_gen::Kind>>>
 
     //
     // maybe add a vec of all generations
@@ -80,7 +83,7 @@ impl std::fmt::Display for World{
 }
 
 impl World{
-    pub fn new(dim: (Dow, Dow), n_of_bots: u16, selection_criteria: criteria::Criteria) -> Self {
+    pub fn new(dim: (Dow, Dow), n_of_bots: u16, selection_criteria: criteria::Criteria, path: String) -> Self {
 
         // checking input
         if dim.0 == Dow::MAX || dim.1 == Dow::MAX{panic!("dim.0/dim.1 must be smaller than Dow::Max; buffer needed")}
@@ -117,6 +120,7 @@ impl World{
         World { dim,
                 n_of_bots,
                 selection_criteria,
+                path,
                 generation: 0,
                 time: 0,
                 age_of_gen: 0,
@@ -209,29 +213,11 @@ impl World{
 
         // replace bot vec with edited vec
 
-        ///
-        /// 
-        /// 
-        /// continue making the vec 
-        /// 0 => empty
-        /// 1 => Bot
-        /// 2 => BarrierBlock
-        /// push the picture vec in the grid_store
-        /// the add parameter outputfolder
-        /// make every generation a json file and continue with ui
-        /// 
-        /// 
         self.bot_vec = bot_vec_copy;
         self.age_of_gen += 1;
-        let mut picture_vec = vec![vec![0u8; self.dim.0 as usize]; self.dim.1 as usize];
-        for (y,row) in self.grid.iter().enumerate(){
-            for (x, block) in row.iter().enumerate(){
-                match block.guest{
-                    Some(b) => 
-                }
-            }
-        }
+        
 
+        self.grid_store.push(tools::store_gen::store_step(&*self));
         
         
     }
@@ -240,13 +226,22 @@ impl World{
         let selected_bot_vec = self.selection_criteria.select(self);
         let mut new_bot_vec: Vec<objects::Bot> = vec![];
 
-        for i in 0..self.n_of_bots{
-            let mut new_bot = objects::Bot::clone_(unsafe{&*selected_bot_vec[i as usize%selected_bot_vec.len()]}, & self.neuron_lib);
-            new_bot_vec.push(new_bot);
+        if selected_bot_vec.len() == 0{
+            
+            for i in 0..self.n_of_bots{
+                new_bot_vec.push(objects::Bot::new(neurons::create_genome(&self.neuron_lib)));
+            }
         }
 
-        self.bot_vec = new_bot_vec;
+        else{
+            for i in 0..self.n_of_bots{
+                
+                let new_bot = objects::Bot::clone_(unsafe{&*selected_bot_vec[i as usize%selected_bot_vec.len()]}, & self.neuron_lib);
+                new_bot_vec.push(new_bot);
+            }
 
+            self.bot_vec = new_bot_vec;
+        }
     }
 
     pub fn calculate_generation(&mut self){
@@ -254,7 +249,8 @@ impl World{
             self.calculate_step();
         }
 
-        self.store_generation();
+        tools::store_gen::store_generation(&*self);
+        self.grid_store = vec![];
 
         self.age_of_gen = 0;
         self.generation += 1;
@@ -265,7 +261,4 @@ impl World{
 
     }
 
-    pub fn store_generation(&self){
-        
-    }
 }
