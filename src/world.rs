@@ -30,7 +30,7 @@ pub struct World{
     n_of_bots: u16,
 
     // selection criteria can be found in criteria.rs
-    selection_criteria: criteria::Criteria,
+    pub selection_criteria: criteria::Criteria,
 
     // output path
     pub path: String,
@@ -256,13 +256,12 @@ impl World{
 
         tools::store_gen::store_generation(&*self);
         self.grid_store = vec![];
-        println!("Stored");
+
 
         self.age_of_gen = 0;
         self.generation += 1;
 
         self.select();
-        println!("selected");
 
         self.spawn_bots();
 

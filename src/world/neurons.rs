@@ -159,27 +159,30 @@ pub fn mutate(genome: &mut[u32; super::GENOME_LENGTH], neuron_lib: &Vec<&usize>)
         // go through every letter and change it by chance
         // c2 is the counter of the inner for loop
         let mut c2 = 0;
-        for letter in hex_gene.iter_mut(){
-
-            match rng.gen_bool(super::MUTATION_RATE) { 
-                // if mutation occurs, the loop searches for a new random valid gene 
-                // the validaty is checked with the neurons::valid_gene fn
-                // if valid the new_letter is assigned to the *letter
-                true => *letter =   
-                    loop{// choose a random char from the hex_letters array
-                        let new_letter = *hex_letters.choose(&mut rng).unwrap();
-                        // the new_gene is a copy of the gene
-                        let mut new_gene = og_gene.clone();
-                        new_gene[c2] = new_letter; // the new letter is changed and checked
-                        
-                        match valid_gene(new_gene, neuron_lib){
-                            true=>break new_letter,
-                            false=> continue
-                        }
-                    }, 
-                false => {}
+        if rng.gen_bool(super::MUTATION_RATE){
+            for letter in hex_gene.iter_mut(){
+                
+                match rng.gen_bool(1.0/(super::GENOME_LENGTH as f64)) {
+                    // if mutation occurs, the loop searches for a new random valid gene 
+                    // the validaty is checked with the neurons::valid_gene fn
+                    // if valid the new_letter is assigned to the *letter
+                    true => {*letter =   
+                        loop{// choose a random char from the hex_letters array
+                            let new_letter = *hex_letters.choose(&mut rng).unwrap();
+                            // the new_gene is a copy of the gene
+                            let mut new_gene = og_gene.clone();
+                            new_gene[c2] = new_letter; // the new letter is changed and checked
+                            
+                            match valid_gene(new_gene, neuron_lib){
+                                true=>break new_letter,
+                                false=> continue
+                            }
+                        }; 
+                        break;}, 
+                    false => {}
+                }
+                c2+=1;    
             }
-            c2+=1;    
         }
         c1+=1;
         // end of for
@@ -187,9 +190,11 @@ pub fn mutate(genome: &mut[u32; super::GENOME_LENGTH], neuron_lib: &Vec<&usize>)
         // convert the new gene in a u32
 
         // convert the vec<char> in a string
-        let string_gene: String = hex_gene.into_iter().collect();
+        let string_gene: String = hex_gene.clone().into_iter().collect();
         // convert the hex string in a u32 and perform the .decode_gene methode
         *gene = u32::from_str_radix(&string_gene, 16).expect("REASON");
+        assert_eq!(gene.decode_gene(), hex_gene.decode_gene());
+        assert_eq!(valid_gene(*gene, neuron_lib), true)
     }
 }
 

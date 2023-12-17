@@ -151,6 +151,7 @@ pub fn mutate(bot: &mut Bot, world: &mut World){
     if NEURONAL_MUTATION_ENABLED &&
     rng.gen_bool(NEURONAL_MUTATION_RATE){
         neurons::mutate(&mut bot.genome, &world.neuron_lib);
+        println!("mutation {}", neurons::valid_gene(bot.genome[0], &world.neuron_lib))
     }
 }
 
