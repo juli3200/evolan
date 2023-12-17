@@ -6,19 +6,16 @@ use crate::{tools, settings};
 // impl of ObjectTrait for every Object
 impl ObjectTrait for Bot{
     fn pos(&self)->(super::Dow, super::Dow) {(self.x, self.y)}
-    fn kind(&self) -> super::ObjectsEnum {
-        let raw_bot_pointer: *const Bot = self;
-        super::ObjectsEnum::Bot(raw_bot_pointer)
+    fn genome(&self) -> Option<[u32; crate::settings::GENOME_LENGTH]> {
+        Some(self.genome.clone())
     }
 }
 impl ObjectTrait for BarrierBlock{
     fn pos(&self)->(super::Dow, super::Dow) {(self.x, self.y)}
-    fn kind(&self) -> super::ObjectsEnum {
-        let raw_bb_pointer: *const BarrierBlock = self;
-        super::ObjectsEnum::BarrierBlock(raw_bb_pointer)
-    }
+   fn genome(&self) -> Option<[u32; crate::settings::GENOME_LENGTH]> {
+       None
+   }
 }
-
 
 // Bot 
 #[derive(Debug, Clone)]
@@ -57,6 +54,7 @@ impl Bot {
     // with the inherit function it's not neccesary to call the new function
     // the genome is provided using the 
     // todo: check
+    // update
     pub fn inherit(parents: (&Bot, &Bot), neuron_lib: &Vec<&usize>) -> Self{
         let mut rng = rand::thread_rng();
 
@@ -84,8 +82,9 @@ impl Bot {
     }
 
     // new bot is created as a clone of the old one with mutation
-    pub fn clone_(parent: &Bot,  neuron_lib: &Vec<&usize>) -> Self{
-        let mut genome = parent.genome.clone();
+    pub fn clone_(parent_genome: &[u32; crate::settings::GENOME_LENGTH],  neuron_lib: &Vec<&usize>) -> Self{
+        let mut genome = parent_genome.clone();
+        assert_eq!(genome, *parent_genome);
         
         if super::MUTATION_ENABLED{
             super::neurons::mutate(&mut genome, neuron_lib);

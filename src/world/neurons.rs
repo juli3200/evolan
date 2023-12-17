@@ -121,7 +121,7 @@ impl GeneTrait for Vec<char> {
 }
 
 // ✅
-pub fn valid_gene(gene: Vec<char>, neuron_lib: &Vec<&usize>)-> bool{
+pub fn valid_gene<T:GeneTrait>(gene: T, neuron_lib: &Vec<&usize>)-> bool{
     // checks if mutated gene is valid
 
     // decode Vec<char> gene 
@@ -150,7 +150,7 @@ pub fn mutate(genome: &mut[u32; super::GENOME_LENGTH], neuron_lib: &Vec<&usize>)
 
         let mut rng = rand::thread_rng();
         
-        println!("{:08X}", gene);
+        
 
         let mut hex_gene: Vec<char> = format!("{:08X}", gene).chars().collect(); // convert u32 in hex string
         

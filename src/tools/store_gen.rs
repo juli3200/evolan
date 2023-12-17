@@ -3,7 +3,6 @@ use serde_json::to_string;
 use std::io::Write;
 use std::fs::File;
 
-use crate::world::ObjectsEnum;
 
 #[derive(Debug, Clone, Serialize)]
 pub enum Kind{
@@ -17,10 +16,11 @@ pub fn store_step(world: &crate::world::World) -> Vec<Vec<Kind>>{
     for (y,row) in world.grid.iter().enumerate(){
         for (x, block) in row.iter().enumerate(){
             match block.guest{
+                // if genome is returned must be bot
                 Some(b) => {
-                    match unsafe {&*b}.kind() {
-                        ObjectsEnum::BarrierBlock(_) => picture_vec[y][x] = Kind::BarrierBlock,
-                        ObjectsEnum::Bot(_) => picture_vec[y][x] = Kind::Bot
+                    match unsafe {&*b}.genome() {
+                        None => picture_vec[y][x] = Kind::BarrierBlock,
+                        Some(_) => picture_vec[y][x] = Kind::Bot
                     }
                 }
                 None => {picture_vec[y][x] = Kind::Empty}

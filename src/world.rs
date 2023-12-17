@@ -11,16 +11,11 @@ pub mod criteria;
 use crate::{settings::*, tools};
 
 
-pub enum ObjectsEnum{
-    Bot(*const objects::Bot),
-    BarrierBlock(*const objects::BarrierBlock)
-}
-
 // trait for all Objects
 pub trait ObjectTrait{
     // pos fn for every object
     fn pos(&self)->(Dow, Dow);
-    fn kind(&self) -> ObjectsEnum;
+    fn genome(&self) -> Option<[u32; crate::settings::GENOME_LENGTH]>;
 }
 
 impl std::fmt::Debug  for dyn ObjectTrait{
@@ -187,7 +182,7 @@ impl World{
         // the function bot.neurons_to_comute is called
         // this returns a Vec of vecs(one per bot) of vecs(one per neccesery gene)
         // the neurons are sorted per layer
-        let input_neurons: Vec<Vec<Vec<[f64; 5]>>> = self.bot_vec.par_iter()// the process is computed in parrallel with .par_iter() method
+        let input_neurons: Vec<Vec<Vec<[f64; 5]>>> = self.bot_vec.iter()// the process is computed in parrallel with .par_iter() method
         .map(|bot: &objects::Bot| bot.calculate_input(/*make &self immutable*/&*self))
         // collect the outputs of all bots in a Vec<Vec<[f64; 2]>>
         .collect::<Vec<_>>();
@@ -199,7 +194,7 @@ impl World{
             // returns a vec of vec(bot) of output neurons
             output = input_neurons.par_iter().
             map(|bot| crate::calculate::calc_step(bot)).collect::<Vec<_>>();
-            println!("{:?}", output);
+            
         }
         
         //  pass to bot.react(vec<usize>)
@@ -223,25 +218,31 @@ impl World{
     }
 
     fn select(&mut self){
+
         let selected_bot_vec = self.selection_criteria.select(self);
+
         let mut new_bot_vec: Vec<objects::Bot> = vec![];
 
         if selected_bot_vec.len() == 0{
-            
+
             for i in 0..self.n_of_bots{
                 new_bot_vec.push(objects::Bot::new(neurons::create_genome(&self.neuron_lib)));
             }
+
         }
 
         else{
+            
             for i in 0..self.n_of_bots{
+                let b = selected_bot_vec[i as usize%selected_bot_vec.len()];
                 
-                let new_bot = objects::Bot::clone_(unsafe{&*selected_bot_vec[i as usize%selected_bot_vec.len()]}, & self.neuron_lib);
+                let new_bot = objects::Bot::clone_(&b, &self.neuron_lib);
+               
                 new_bot_vec.push(new_bot);
             }
-
-            self.bot_vec = new_bot_vec;
+            
         }
+        self.bot_vec = new_bot_vec;
     }
 
     pub fn calculate_generation(&mut self){
@@ -251,11 +252,13 @@ impl World{
 
         tools::store_gen::store_generation(&*self);
         self.grid_store = vec![];
+        println!("Stored");
 
         self.age_of_gen = 0;
         self.generation += 1;
 
         self.select();
+        println!("selected");
 
         self.spawn_bots();
 

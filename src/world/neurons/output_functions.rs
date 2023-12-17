@@ -12,7 +12,7 @@ pub fn turn_left(bot: &mut Bot, world: &mut World){
 
 // 0 = 0, 1 = 90, 2 = 180, 3= 270
 pub fn turn_right(bot: &mut Bot, world: &mut World){
-    bot.angle -= 1;
+    bot.angle += 3;
     bot.angle %= 4;
 }
 

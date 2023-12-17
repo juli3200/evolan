@@ -92,12 +92,12 @@ pub fn calc_step(input_neurons: &Vec<Vec<[f64; 5]>>) -> Vec<usize>{
     } // end outer for (layers)
 
     let mut activated_outputs = vec![];
-    println!("{:?}", output_vec.last().unwrap());
+
 
     // access output layer from the output_vec
     for (index, output_neuron) in output_vec[output_vec.len()-1].iter().enumerate(){
         match output_neuron {
-            Some(val) => {if *val >= 0.0{activated_outputs.push(index); println!("{}", index);}}
+            Some(val) => {if *val >= 0.0{activated_outputs.push(index);}}
             None => continue
         }
     }

@@ -1,6 +1,7 @@
-use crate::settings::KILLING_ENABLED;
+use crate::settings::Dow;
+use crate::world::neurons;
 
-use super::{World, ObjectTrait, ObjectsEnum};
+use super::{World, ObjectTrait};
 use super::objects::Bot;
 
 #[derive(Debug)]
@@ -11,34 +12,19 @@ pub enum Criteria{
 
     
 
-fn area_fn(world: &World, coords: &[(u8, u8); 2]) -> Vec<*const Bot>{
-    let mut selected_bot_vec: Vec<*const Bot> = vec![];
+fn area_fn(world: &World, coords: &[(Dow, Dow); 2]) -> Vec<[u32; crate::settings::GENOME_LENGTH]>{
+    let mut selected_bot_vec: Vec<[u32; crate::settings::GENOME_LENGTH]> = vec![];
 
     // create the selected bot_vec
-    // iterate over the rectangle in the grid
-    for y in coords[0].1..coords[1].1{
-        for x in coords[0].0..coords[1].0{
+    // iterate over the bots and check if they are in area
 
-            // matchh the guest of the current coordinate
-            match world.grid[y as usize][x as usize].guest{
-                // if guest is Some check if the raw pointer isnt null
-                Some(block) => {
-                    if !block.is_null(){
-
-                        // dereference raw pointer and convert to reference
-                        let reference = unsafe{&*block};
-                        // match reference and check if Bot 
-                        match reference.kind() {
-                            ObjectsEnum::Bot(bot) => selected_bot_vec.push(bot),
-                            ObjectsEnum::BarrierBlock(_) => continue
-                        }
-                    }
-                    else {println!("error in area"); continue;}
-                }, 
-                None => continue
-            }
+    for bot in world.bot_vec.iter(){
+        if /*y coord*/(bot.y >= coords[0].1 && bot.y < coords[1].1) &&  (bot.x >= coords[0].0 && bot.x < coords[1].0){
+            selected_bot_vec.push(bot.genome.clone());
         }
     }
+
+    
 
     // selected bot vec is returned to the world select fn
     selected_bot_vec
@@ -47,11 +33,12 @@ fn area_fn(world: &World, coords: &[(u8, u8); 2]) -> Vec<*const Bot>{
 
 impl Criteria{
     // selcect survived bots based on criteris
-    pub fn select(&self, world: &World) -> Vec<*const Bot>{
+    pub fn select(&self, world: &World) -> Vec<[u32; crate::settings::GENOME_LENGTH]>{
         match self {
             Self::Area(coords) => {area_fn(world, coords)},
 
         }
+
     }
 
 }
