@@ -1,21 +1,8 @@
 use rand::Rng;
-use super::ObjectTrait;
-use super::neurons::GeneTrait;
+
+use super::{neurons::GeneTrait, Kind};
 use crate::{tools, settings};
 
-// impl of ObjectTrait for every Object
-impl ObjectTrait for Bot{
-    fn pos(&self)->(super::Dow, super::Dow) {(self.x, self.y)}
-    fn genome(&self) -> Option<[u32; crate::settings::GENOME_LENGTH]> {
-        Some(self.genome.clone())
-    }
-}
-impl ObjectTrait for BarrierBlock{
-    fn pos(&self)->(super::Dow, super::Dow) {(self.x, self.y)}
-   fn genome(&self) -> Option<[u32; crate::settings::GENOME_LENGTH]> {
-       None
-   }
-}
 
 // Bot 
 #[derive(Debug, Clone)]
@@ -35,6 +22,7 @@ pub struct Bot{
     // genome; hex -> view concept
     pub genome: [u32; super::GENOME_LENGTH],
 
+    id: u16,
     
 
 }
@@ -43,11 +31,12 @@ impl Bot {
     // the new function creates the Bot without any information except the genome
     // this is because the grid and &world is not known
     // ✅
-    pub fn new(genome: [u32; super::GENOME_LENGTH]) -> Self{
+    pub fn new(genome: [u32; super::GENOME_LENGTH], id: u16) -> Self{
         Bot { x: super::Dow::MAX, 
               y: super::Dow::MAX, 
               angle: 0, 
-              genome
+              genome, 
+              id
               }
     }
 
@@ -55,7 +44,7 @@ impl Bot {
     // the genome is provided using the 
     // todo: check
     // update
-    pub fn inherit(parents: (&Bot, &Bot), neuron_lib: &Vec<&usize>) -> Self{
+    pub fn inherit(parents: (&Bot, &Bot), neuron_lib: &Vec<&usize>,  id: u16) -> Self{
         let mut rng = rand::thread_rng();
 
         // create a genome with zeros
@@ -76,13 +65,13 @@ impl Bot {
             super::neurons::mutate(&mut genome, neuron_lib);
         }
 
-        Self::new(genome)
+        Self::new(genome, id)
 
 
     }
 
     // new bot is created as a clone of the old one with mutation
-    pub fn clone_(parent_genome: &[u32; crate::settings::GENOME_LENGTH],  neuron_lib: &Vec<&usize>) -> Self{
+    pub fn clone_(parent_genome: &[u32; crate::settings::GENOME_LENGTH],  neuron_lib: &Vec<&usize>, id: u16) -> Self{
         let mut genome = parent_genome.clone();
         assert_eq!(genome, *parent_genome);
         
@@ -90,7 +79,7 @@ impl Bot {
             super::neurons::mutate(&mut genome, neuron_lib);
         }
 
-        Self::new(genome)
+        Self::new(genome, id)
     }
 
     // the spawn function adds further information(coordinates) & is called after the World::new() in the World::spawn
@@ -187,9 +176,9 @@ impl BarrierBlock{
 #[derive(Debug, Clone)]
 pub struct Block{
     // this block contains information about the guest of the block
-    // e.g a bot han be a guest in the Block
+    // e.g a bot can be a guest in the Block
 
-    pub guest: Option<*const/*add a mut if needed*/ dyn ObjectTrait>,
+    pub guest: super::Kind,
     
     // coordinates; i32
     x: super::Dow,
@@ -204,15 +193,11 @@ pub struct Block{
 
 
 impl Block{
-    pub fn new(guest: Option<*const/*add a mut if needed*/ dyn ObjectTrait>, x: super::Dow, y: super::Dow)-> Self{
+    pub fn new(guest: Kind, x: super::Dow, y: super::Dow)-> Self{
         Block {guest, x, y, letters: vec![]}
     }
 
-    pub fn edit_guest(&mut self, guest: Option<*const/*add a mut if needed*/dyn ObjectTrait>){
-        match guest{
-            None  => {self.guest = None;}
-            Some(raw_pointer) => {
-                self.guest = Some(raw_pointer)}
-        }
+    pub fn edit_guest(&mut self, guest: Kind){
+        self.guest = guest;
     }
 }

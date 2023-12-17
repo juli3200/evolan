@@ -7,7 +7,7 @@ pub const INPUT_NEURONS: u8 = 17; // number of input neurons; max 32
 pub const OUTPUT_NEURONS: u8 = 11; // number of output neurons; MAX 32
 
 // general settings
-pub const GENOME_LENGTH: usize = 1; // length of genomes
+pub const GENOME_LENGTH: usize = 16; // length of genomes
 pub const INNER_LAYERS: usize = 1; // max val 3; because of gene generation (more bites assigned to the index bits)
 pub const OUTPUT_LAYER: usize = INNER_LAYERS + 1;
 pub const INNER_NEURONS: usize = 2; // inner neurons per inner layer

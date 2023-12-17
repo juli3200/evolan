@@ -1,4 +1,4 @@
-use super::super::{objects::Bot, World};
+use super::super::{objects::Bot, World, Kind};
 use crate::settings::*;
 
 use rand::Rng;
@@ -45,8 +45,8 @@ pub fn population_density(bot: &Bot, world: &World) -> f64{ // 3
         for x in lower_x_bound..upper_x_bound {
             // Check for guests in the grid
             match world.grid[y as usize][x as usize].guest {
-                Some(_) => {n_blocks += 1;}
-                None => {continue;}
+                Kind::Bot(_) => {n_blocks += 1;}
+                _ => {continue;}
             }
         }
     }
@@ -86,8 +86,8 @@ fn nearest_neighbour(bot: &Bot, world: &World) -> Option<(usize, usize)>{
                 else if y < 0 || y>world.dim.1 as i32 {continue;}
 
                 match world.grid[y as usize][x as usize].guest{
-                    Some(_) => {return Some((x as usize, y as usize))},
-                    None => {continue;}
+                    Kind::Bot(_) => {return Some((x as usize, y as usize))},
+                    _ => {continue;}
                 }
             }
         }
@@ -162,8 +162,8 @@ pub fn blocked_angle(bot: &Bot, world: &World) -> f64{ // 15
         if coord.1 >= 0 && coord.1 < world.grid.len() as i32 &&
         coord.0 >= 0 && coord.0 < world.grid[0].len() as i32 {
             match world.grid[coord.1 as usize][coord.0 as usize].guest {
-                Some(_) => return c,
-                None => c += 1.0,
+                Kind::Empty => c += 1.0,
+                _ => return c/2.0 -1.0,
             }
         }
     }

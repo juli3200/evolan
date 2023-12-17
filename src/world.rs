@@ -1,7 +1,8 @@
 use std::{process::Output, fmt::write};
 
 use rand::Rng;
-use rayon::prelude::*;
+use rayon::{prelude::*, iter::Empty};
+use serde::Serialize;
 
 pub mod objects;
 pub mod neurons;
@@ -10,19 +11,13 @@ pub mod criteria;
 // constants
 use crate::{settings::*, tools};
 
-
-// trait for all Objects
-pub trait ObjectTrait{
-    // pos fn for every object
-    fn pos(&self)->(Dow, Dow);
-    fn genome(&self) -> Option<[u32; crate::settings::GENOME_LENGTH]>;
+#[derive(Debug, Clone, Serialize,  Copy)]
+pub enum Kind{
+    Bot(u16),
+    BarrierBlock,
+    Empty
 }
 
-impl std::fmt::Debug  for dyn ObjectTrait{
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result{
-        write!(f, "{:?}", self.pos())
-    }
-}
 
 
 
@@ -55,7 +50,7 @@ pub struct World{
 
     pub neuron_lib: Vec<&'static usize>,
 
-    pub grid_store: Vec<Vec<Vec<tools::store_gen::Kind>>>
+    pub grid_store: Vec<Vec<Vec<Kind>>>
 
     //
     // maybe add a vec of all generations
@@ -97,8 +92,8 @@ impl World{
 
         // the bot vec contains every bot
             let mut bot_vec: Vec<objects::Bot> = vec![];
-            for i in 0..n_of_bots{
-                bot_vec.push(objects::Bot::new(neurons::create_genome(&neuron_lib)));
+            for i in 0..n_of_bots {
+                bot_vec.push(objects::Bot::new(neurons::create_genome(&neuron_lib), i));
             }
         //
 
@@ -107,7 +102,7 @@ impl World{
         for y in 0..dim.1{
             let mut row = Vec::new();
             for x in 0..dim.0{
-                row.push(objects::Block::new(None, x, y));
+                row.push(objects::Block::new(Kind::Empty, x, y));
             }
             grid.push(row);
         }
@@ -140,9 +135,8 @@ impl World{
 
             self.barrier_block_vec.push(objects::BarrierBlock::new(coord.0, coord.1)); // create new barrier block
 
-            // create the raw pointer witch is passed to the Block on the coordinate
-            let raw_pointer: *const dyn ObjectTrait = &self.barrier_block_vec[index]; 
-            self.grid[coord.1 as usize][coord.0 as usize].edit_guest(Some(raw_pointer));
+            // create the raw pointer witch is passed to the Block on the coordinate 
+            self.grid[coord.1 as usize][coord.0 as usize].edit_guest(Kind::BarrierBlock);
             
         }
     }
@@ -151,7 +145,7 @@ impl World{
         let mut rng = rand::thread_rng();
 
 
-        for bot in self.bot_vec.iter_mut(){
+        for (i, bot) in self.bot_vec.iter_mut().enumerate(){
 
             // gen coords and check validaty
             let coords = loop{
@@ -160,17 +154,14 @@ impl World{
 
                 // check coords
                 match self.grid[y][x].guest{
-                    None => {break (x, y);}
-                    Some(_) =>{continue;}
+                    Kind::Empty => {break (x, y);}
+                    _ =>{continue;}
                 }
             };
 
             bot.spawn(coords.0 as Dow, coords.1 as Dow);
-
-            // create raw pointer
-            let raw_pointer: *const dyn ObjectTrait = bot;
             // add the raw pointer to the grid
-            self.grid[coords.1][coords.0].edit_guest(Some(raw_pointer));
+            self.grid[coords.1][coords.0].edit_guest(Kind::Bot(i as u16));
         }
 
         self.bots_alive = self.n_of_bots;
@@ -182,7 +173,7 @@ impl World{
         // the function bot.neurons_to_comute is called
         // this returns a Vec of vecs(one per bot) of vecs(one per neccesery gene)
         // the neurons are sorted per layer
-        let input_neurons: Vec<Vec<Vec<[f64; 5]>>> = self.bot_vec.iter()// the process is computed in parrallel with .par_iter() method
+        let input_neurons: Vec<Vec<Vec<[f64; 5]>>> = self.bot_vec.par_iter()// the process is computed in parrallel with .par_iter() method
         .map(|bot: &objects::Bot| bot.calculate_input(/*make &self immutable*/&*self))
         // collect the outputs of all bots in a Vec<Vec<[f64; 2]>>
         .collect::<Vec<_>>();
@@ -226,7 +217,7 @@ impl World{
         if selected_bot_vec.len() == 0{
 
             for i in 0..self.n_of_bots{
-                new_bot_vec.push(objects::Bot::new(neurons::create_genome(&self.neuron_lib)));
+                new_bot_vec.push(objects::Bot::new(neurons::create_genome(&self.neuron_lib), i));
             }
 
         }
@@ -236,13 +227,26 @@ impl World{
             for i in 0..self.n_of_bots{
                 let b = selected_bot_vec[i as usize%selected_bot_vec.len()];
                 
-                let new_bot = objects::Bot::clone_(&b, &self.neuron_lib);
+                let new_bot = objects::Bot::clone_(&b, &self.neuron_lib, i);
                
                 new_bot_vec.push(new_bot);
             }
             
         }
         self.bot_vec = new_bot_vec;
+
+        // resetting self.grid
+        for row in self.grid.iter_mut(){
+            for block in row{
+                match block.guest {
+                    Kind::Bot(_) => block.guest = Kind::Empty,
+                    Kind::Empty => block.guest = Kind::Empty,
+                    Kind::BarrierBlock => block.guest = Kind::BarrierBlock
+                }
+            }
+        }
+        self.spawn_bots();
+
     }
 
     pub fn calculate_generation(&mut self){

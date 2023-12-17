@@ -2,29 +2,15 @@ use serde::Serialize;
 use serde_json::to_string;
 use std::io::Write;
 use std::fs::File;
+use crate::world::Kind;
 
 
-#[derive(Debug, Clone, Serialize)]
-pub enum Kind{
-    Bot,
-    BarrierBlock,
-    Empty
-}
 
 pub fn store_step(world: &crate::world::World) -> Vec<Vec<Kind>>{
     let mut picture_vec = vec![vec![Kind::Empty; world.dim.0 as usize]; world.dim.1 as usize];
     for (y,row) in world.grid.iter().enumerate(){
         for (x, block) in row.iter().enumerate(){
-            match block.guest{
-                // if genome is returned must be bot
-                Some(b) => {
-                    match unsafe {&*b}.genome() {
-                        None => picture_vec[y][x] = Kind::BarrierBlock,
-                        Some(_) => picture_vec[y][x] = Kind::Bot
-                    }
-                }
-                None => {picture_vec[y][x] = Kind::Empty}
-            }
+            picture_vec[y][x] = block.guest;
         }
     }
 

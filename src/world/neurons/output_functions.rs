@@ -1,7 +1,8 @@
 use crate::tools::plot_network;
-use crate::world::{World, objects::Bot, objects::Block, neurons};
+use crate::world::{Kind, World, objects::Bot, objects::Block, neurons};
 use crate::settings::*;
 use rand::Rng;
+use rayon::iter::Empty;
 
 
 // 0 = 0, 1 = 90, 2 = 180, 3= 270
@@ -19,8 +20,8 @@ pub fn turn_right(bot: &mut Bot, world: &mut World){
 fn check_block(world: &mut World, new_coords: &(isize, isize)) -> bool{
     if (new_coords.0 >= 0 &&  new_coords.0 < world.dim.0 as isize) && (new_coords.1 >= 0 && new_coords.1 < world.dim.1 as isize){
         return match world.grid[new_coords.1 as usize][new_coords.0 as usize].guest {
-            None => true, 
-            Some(_) => false
+            Kind::Empty => true, 
+            _ => false
         }
     }
     else {
@@ -31,7 +32,7 @@ fn check_block(world: &mut World, new_coords: &(isize, isize)) -> bool{
 fn edit_grid(world: &mut World, bot: &mut Bot, new_coords: (isize, isize), old_coords: (Dow, Dow)){
     world.grid[new_coords.1 as usize][new_coords.0 as usize].guest = 
     world.grid[old_coords.1 as usize][old_coords.0 as usize].guest.clone();
-    world.grid[old_coords.1 as usize][old_coords.0 as usize].guest = None;
+    world.grid[old_coords.1 as usize][old_coords.0 as usize].guest = Kind::Empty;
     bot.x = new_coords.0 as Dow;
     bot.y = new_coords.1 as Dow;
 

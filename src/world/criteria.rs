@@ -1,7 +1,7 @@
 use crate::settings::Dow;
 use crate::world::neurons;
 
-use super::{World, ObjectTrait};
+use super::World;
 use super::objects::Bot;
 
 #[derive(Debug)]
