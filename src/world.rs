@@ -11,6 +11,8 @@ pub mod criteria;
 // constants
 use crate::{settings::*, tools};
 
+use self::objects::Bot;
+
 #[derive(Debug, Clone, Serialize,  Copy)]
 pub enum Kind{
     Bot(u16),
@@ -210,7 +212,9 @@ impl World{
 
     fn select(&mut self){
 
-        let selected_bot_vec = self.selection_criteria.select(self);
+        let (selected_bot_vec, survivars_grid) = self.selection_criteria.select(self);
+
+        self.grid_store.push(survivars_grid);
 
         let mut new_bot_vec: Vec<objects::Bot> = vec![];
 
@@ -226,14 +230,21 @@ impl World{
             
             for i in 0..self.n_of_bots{
                 let b = selected_bot_vec[i as usize%selected_bot_vec.len()];
+                let b2 = selected_bot_vec[(i+1) as usize%selected_bot_vec.len()];
                 
-                let new_bot = objects::Bot::clone_(&b, &self.neuron_lib, i);
+
+                let new_bot = match INHERIT{
+                    true => objects::Bot::inherit((&b, &b2), &self.neuron_lib, i),
+                
+                    false => objects::Bot::clone_(&b, &self.neuron_lib, i),
+                };
                
                 new_bot_vec.push(new_bot);
             }
             
         }
         self.bot_vec = new_bot_vec;
+
 
         // resetting self.grid
         for row in self.grid.iter_mut(){
@@ -253,15 +264,14 @@ impl World{
         for _ in 0..crate::settings::GENERATION_STEPS{
             self.calculate_step();
         }
-
-        tools::store_gen::store_generation(&*self);
-        self.grid_store = vec![];
-
+   
+        self.select();
 
         self.age_of_gen = 0;
         self.generation += 1;
 
-        self.select();
+        tools::store_gen::store_generation(&*self);
+        self.grid_store = vec![];
 
         self.spawn_bots();
 

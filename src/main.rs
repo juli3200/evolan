@@ -11,7 +11,7 @@ use std::ffi::{CString, CStr};
 
 fn main(){
     let p = "C://users//julia//desktop//test_moving_area".to_string();
-    let mut main_world: world::World = world::World::new((80, 80),200 , criteria::Criteria::Area([(0,0), (5, 80)]), p);
+    let mut main_world: world::World = world::World::new((120, 120),1000 , criteria::Criteria::Area([(0,0), (5, 80)]), p);
     
     main_world.spawn_bots();
 
@@ -20,6 +20,7 @@ fn main(){
         main_world.calculate_generation();
         println!("{}", i)
     }
+    /* 
     main_world.selection_criteria = criteria::Criteria::Area([(0,0), (5, 40)]);
     for i in 0..200{
         main_world.calculate_generation();
@@ -36,6 +37,7 @@ fn main(){
         println!("{}", i+900)
     }
     //main_world.bot_vec[0].draw_graph();
+    */
 
 
 

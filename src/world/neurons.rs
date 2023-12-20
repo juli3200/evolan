@@ -160,6 +160,7 @@ pub fn mutate(genome: &mut[u32; super::GENOME_LENGTH], neuron_lib: &Vec<&usize>)
         // c2 is the counter of the inner for loop
         let mut c2 = 0;
         if rng.gen_bool(super::MUTATION_RATE){
+            println!("mutation");
             for letter in hex_gene.iter_mut(){
                 
                 match rng.gen_bool(1.0/(super::GENOME_LENGTH as f64)) {

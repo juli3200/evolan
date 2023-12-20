@@ -22,7 +22,7 @@ pub struct Bot{
     // genome; hex -> view concept
     pub genome: [u32; super::GENOME_LENGTH],
 
-    id: u16,
+    pub id: u16,
     
 
 }
@@ -44,18 +44,19 @@ impl Bot {
     // the genome is provided using the 
     // todo: check
     // update
-    pub fn inherit(parents: (&Bot, &Bot), neuron_lib: &Vec<&usize>,  id: u16) -> Self{
+    pub fn inherit(parents: (&[u32; crate::settings::GENOME_LENGTH], &[u32; crate::settings::GENOME_LENGTH]), neuron_lib: &Vec<&usize>,  id: u16) -> Self{
         let mut rng = rand::thread_rng();
 
         // create a genome with zeros
         let mut genome: [u32; super::GENOME_LENGTH] = [0u32; super::GENOME_LENGTH];
+
         
         // filling raw genome with random value of parents
         let mut c = 0; // couter c
         for gene in genome.iter_mut(){
             match rng.gen_bool(0.5){
-                true=> *gene = parents.0.genome[c as usize],
-                false => *gene = parents.1.genome[c as usize],
+                true=> *gene = parents.0[c as usize],
+                false => *gene = parents.1[c as usize],
             }
             c+= 1
         }
