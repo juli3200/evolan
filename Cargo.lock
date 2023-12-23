@@ -149,7 +149,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "evolang"
+name = "evvolan"
 version = "0.1.0"
 dependencies = [
  "bindgen",
