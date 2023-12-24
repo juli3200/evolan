@@ -3,11 +3,11 @@ mod world;
 mod calculate;
 mod settings;
 mod tools;
+mod tests;
 
 use world::{objects, neurons, criteria};
 use neurons::GeneTrait;
 
-use std::ffi::{CString, CStr};
 
 fn main(){
     let p = "C://users//julia//desktop//test_moving_area".to_string();
