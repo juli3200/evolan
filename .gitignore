@@ -1,2 +1,4 @@
 /target
 /.idea
+/visualizing/__pycache__
+/visualizing/.idea
