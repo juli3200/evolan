@@ -16,14 +16,18 @@ fn archive(input_path: &String, output_path: &String) -> Result<(), Box<dyn std:
     // eg project.evolan1
     // indicates that it isn't compressed
     let tar_path = format!("{}1", output_path);
+
     let tar_file =File::create(&tar_path)?;
+
     let mut archive = Builder::new(tar_file);
+
 
      // Iterate through the directory and add files to the TAR archive
      for entry in WalkDir::new(&tar_path).into_iter().filter_map(|e| e.ok()) {
         let path = entry.path();
         if path.is_file() {
-            let file_name = path.strip_prefix(&tar_path)?.to_string_lossy().into_owned();
+            let file_name = path.file_name().unwrap().to_string_lossy().into_owned();
+            println!("done 22{}", file_name);
             archive.append_path_with_name(path, file_name)?;
         }
     }

@@ -10,8 +10,8 @@ use neurons::GeneTrait;
 
 
 fn main(){
-    let p = "C://users//julia//desktop//test_moving_area".to_string();
-    let mut main_world: world::World = world::World::new((120, 120),1000 , criteria::Criteria::Area([(0,0), (5, 80)]), p);
+    let p = "/home/julianheer/Desktop/test_for_storing/o".to_string();
+    let mut main_world: world::World = world::World::new((40, 40),100 , criteria::Criteria::Area([(0,0), (5, 40)]), p);
     
     main_world.spawn_bots();
 
