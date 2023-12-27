@@ -12,7 +12,7 @@ use walkdir::WalkDir;
 
 static TAR_PATH: &str ="cache/0.evolan1";
 
-fn archive(input_path: &String) -> Result<(), Box<dyn std::error::Error>>{
+fn archive(input_path: &str) -> Result<(), Box<dyn std::error::Error>>{
     // create tar file at output location
     // add a 1 to the file
     // eg project.evolan1
@@ -38,7 +38,7 @@ fn archive(input_path: &String) -> Result<(), Box<dyn std::error::Error>>{
     Ok(())
 }
 
-fn compress(path: &String) ->  Result<(), Box<dyn std::error::Error>>{
+fn compress(path: &str) ->  Result<(), Box<dyn std::error::Error>>{
     // open the previously created tar_file
     let mut tar_file = File::open(TAR_PATH)?;
     let lz4_file = File::create(path)?;
@@ -62,7 +62,7 @@ param output_path: path to compressed archive ends with .evolan
 fn: calls archive and compress 
 return: Ok or Error
 */
-pub fn save(input_path: &String, output_path: &String) -> Result<(), Box<dyn std::error::Error>>{
+pub fn save(input_path: &str, output_path: &str) -> Result<(), Box<dyn std::error::Error>>{
     archive(input_path)?;
     compress(output_path)?;
 

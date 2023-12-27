@@ -2,7 +2,6 @@ use crate::tools::plot_network;
 use crate::world::{Kind, World, objects::Bot, objects::Block, neurons};
 use crate::settings::*;
 use rand::Rng;
-use rayon::iter::Empty;
 
 
 // 0 = 0, 1 = 90, 2 = 180, 3= 270
@@ -155,26 +154,28 @@ pub fn mutate(bot: &mut Bot, world: &mut World){
 }
 
 // modify??
-/* 
-pub fn kill(world: &mut World, bot: &mut Bot){
+
+pub fn kill(bot: &mut Bot,world: &mut World){
     if KILLING_ENABLED{
         let mut new_coords = (bot.x.clone() as isize, bot.y.clone() as isize);
         match bot.angle {
-            0 => {new_coords.0 = if new_coords.0 < world.dim.0 as isize {new_coords.0 + 1}
+            0 => {new_coords.0 = if new_coords.0 + 1 < world.dim.0 as isize {new_coords.0 + 1}
             else{new_coords.0};},
-            1 => {new_coords.1 = if new_coords.1 > 0 {new_coords.1 - 1}
+            1 => {new_coords.1 = if new_coords.1 -1 > 0 {new_coords.1 - 1}
             else{new_coords.1};},
-            2 => {new_coords.0 = if new_coords.0 > 0 {new_coords.0- 1}
+            2 => {new_coords.0 = if new_coords.0 -1 > 0 {new_coords.0- 1}
             else{new_coords.0};},
-            3 => {new_coords.1 = if new_coords.1 < world.dim.1 as isize{new_coords.1 + 1}
+            3 => {new_coords.1 = if new_coords.1 + 1 < world.dim.1 as isize{new_coords.1 + 1}
             else{new_coords.1};},
-            _ => {panic!("Not found, move right")}
+            _ => {panic!("Not found, kill")}
         }
         match world.grid[new_coords.1 as usize][new_coords.0 as usize].guest {
-            Some(block)
+            Kind::Bot(id) =>{
+                world.bots_alive-=1;
+                world.killed_bots.push(id);},
+            _ => {}
         }
     }
 }
-*/
 
 // comm??!!

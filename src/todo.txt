@@ -5,17 +5,8 @@ angle nn fix
 
 backwards connections enable
 
-
 ask cuda bindings (.lib/.dll)
-
-- output neurons
-    code output functions and create the library in neurons.rs
-
-create way to store world
 
 create the cuda version and GPU accelerated version
 
 create python ui
-
-
-fix mutation!!!!!

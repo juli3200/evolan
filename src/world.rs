@@ -41,7 +41,8 @@ pub struct World{
     pub generation: usize,
     time: u64, // time overall; 
     age_of_gen: u16,
-    bots_alive: u16, 
+    pub bots_alive: u16, 
+    killed_bots: Vec<u16>,
 
     // holding of the bots and blocks etc
     pub bot_vec: Vec<objects::Bot>,
@@ -82,7 +83,7 @@ impl World{
         if dim.0 as usize * (dim.1 as usize) < n_of_bots as usize{
             panic!("number of objects must be smaller than dim.0*dim.1")}
 
-        // the neuron lib is a library whitch is used for the creation of the genes
+        // the neuron lib is a library which is used for the creation of the genes
             let mut neuron_lib: Vec<&usize> = Vec::new();
             neuron_lib.push(&(INPUT_NEURONS as usize));
 
@@ -116,7 +117,8 @@ impl World{
                 generation: 0,
                 time: 0,
                 age_of_gen: 0,
-                bots_alive: 0,
+                killed_bots: vec![],
+                bots_alive: n_of_bots,
                 bot_vec,
                 barrier_block_vec: vec![],
                 grid,
@@ -149,7 +151,7 @@ impl World{
 
         for (i, bot) in self.bot_vec.iter_mut().enumerate(){
 
-            // gen coords and check validaty
+            // gen coords and check validity
             let coords = loop{
                 let x = rng.gen_range(0..self.dim.0) as usize;
                 let y = rng.gen_range(0..self.dim.1) as usize;
@@ -172,10 +174,10 @@ impl World{
 
     pub fn calculate_step(&mut self){
         // for every bot in self.bot_vec 
-        // the function bot.neurons_to_comute is called
-        // this returns a Vec of vecs(one per bot) of vecs(one per neccesery gene)
+        // the function bot.neurons_to_compute is called
+        // this returns a Vec of vecs(one per bot) of vecs(one per necessary gene)
         // the neurons are sorted per layer
-        let input_neurons: Vec<Vec<Vec<[f64; 5]>>> = self.bot_vec.par_iter()// the process is computed in parrallel with .par_iter() method
+        let input_neurons: Vec<Vec<Vec<[f64; 5]>>> = self.bot_vec.par_iter()// the process is computed in parallel with .par_iter() method
         .map(|bot: &objects::Bot| bot.calculate_input(/*make &self immutable*/&*self))
         // collect the outputs of all bots in a Vec<Vec<[f64; 2]>>
         .collect::<Vec<_>>();
@@ -203,7 +205,35 @@ impl World{
 
         self.bot_vec = bot_vec_copy;
         self.age_of_gen += 1;
-        
+        // disable killing for better performance
+        if KILLING_ENABLED{
+            self.killed_bots.sort_by(|a, b| b.cmp(a));
+            // removing the killed bots from the bot_vec
+            for index in self.killed_bots.iter(){
+                self.bot_vec.remove(*index as usize);
+            }
+            // setting new ids
+            for (index, bot) in self.bot_vec.iter_mut().enumerate(){
+                bot.id = index as u16;
+            }
+
+            // resetting self.grid
+            for row in self.grid.iter_mut(){
+                for block in row{
+                    match block.guest {
+                        Kind::Bot(_) => block.guest = Kind::Empty,
+                        Kind::Empty => block.guest = Kind::Empty,
+                        Kind::BarrierBlock => block.guest = Kind::BarrierBlock
+                    }
+                }
+            }
+
+            // refilling the grid with the bots
+            for bot in self.bot_vec.iter(){
+                self.grid[bot.y as usize][bot.x as usize].edit_guest(Kind::Bot(bot.id));
+            }
+            self.killed_bots = vec![];
+        }
 
         self.grid_store.push(tools::store_gen::store_step(&*self));
         
@@ -212,9 +242,9 @@ impl World{
 
     fn select(&mut self){
 
-        let (selected_bot_vec, survivars_grid) = self.selection_criteria.select(self);
+        let (selected_bot_vec, survivors_grid) = self.selection_criteria.select(self);
 
-        self.grid_store.push(survivars_grid);
+        self.grid_store.push(survivors_grid);
 
         let mut new_bot_vec: Vec<objects::Bot> = vec![];
 
@@ -269,6 +299,7 @@ impl World{
 
         self.age_of_gen = 0;
         self.generation += 1;
+        self.bots_alive = self.n_of_bots;
 
         tools::store_gen::store_generation(&*self);
         self.grid_store = vec![];
