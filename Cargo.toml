@@ -9,8 +9,6 @@ edition = "2021"
 name = "evolanb"
 path = "src/main.rs"
 
-[tests]
-path = "tests"
 
 [dependencies]
 rand = "0.8.5"

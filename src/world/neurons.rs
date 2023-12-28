@@ -29,7 +29,8 @@ output_functions::neg_x,
 output_functions::pos_y,
 output_functions::neg_y,
 output_functions::place_barrier_block,
-output_functions::mutate];
+output_functions::mutate,
+output_functions::kill];
  
  
 

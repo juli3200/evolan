@@ -10,8 +10,8 @@ use neurons::GeneTrait;
 
 
 fn main(){
-    let p = "/home/julianheer/Desktop/test_for_storing/o".to_string();
-    let mut main_world: world::World = world::World::new((40, 40),100 , criteria::Criteria::Area([(0,0), (5, 40)]), p);
+    let p = "/home/julianheer/output/killing".to_string();
+    let mut main_world: world::World = world::World::new((50, 20),50 , criteria::Criteria::Area([(0,0), (5, 40)]), p);
     
     main_world.spawn_bots();
 
@@ -20,6 +20,12 @@ fn main(){
         main_world.calculate_generation();
         println!("{}", i)
     }
+
+    match tools::save::save("/home/julianheer/output/killing", "/home/julianheer/output/killing.evolan"){
+        Ok(_) => {},
+        Err(e) => panic!("{e}")
+    }
+
     /* 
     main_world.selection_criteria = criteria::Criteria::Area([(0,0), (5, 40)]);
     for i in 0..200{
