@@ -1,3 +1,4 @@
+use crate::GENOME_LENGTH as GL;
 use crate::tools::plot_network;
 use crate::world::{Kind, World, objects::Bot, objects::Block, neurons};
 use crate::settings::*;
@@ -17,7 +18,7 @@ pub fn turn_right(bot: &mut Bot, world: &mut World){
 }
 
 fn check_block(world: &mut World, new_coords: &(isize, isize)) -> bool{
-    if (new_coords.0 >= 0 &&  new_coords.0 < world.dim.0 as isize) && (new_coords.1 >= 0 && new_coords.1 < world.dim.1 as isize){
+    if (new_coords.0 >= 0 &&  new_coords.0 < world.settings_.dim.0 as isize) && (new_coords.1 >= 0 && new_coords.1 < world.settings_.dim.1 as isize){
         return match world.grid[new_coords.1 as usize][new_coords.0 as usize].guest {
             Kind::Empty => true, 
             _ => false
@@ -40,13 +41,13 @@ fn edit_grid(world: &mut World, bot: &mut Bot, new_coords: (isize, isize), old_c
 pub fn move_fw(bot: &mut Bot, world: &mut World){
     let mut new_coords = (bot.x.clone() as isize, bot.y.clone() as isize);
     match bot.angle {
-        0 => {new_coords.0 = if new_coords.0 < world.dim.0 as isize {new_coords.0 + 1}
+        0 => {new_coords.0 = if new_coords.0 < world.settings_.dim.0 as isize {new_coords.0 + 1}
         else{new_coords.0};},
         1 => {new_coords.1 = if new_coords.1 > 0 {new_coords.1 - 1}
         else{new_coords.1};},
         2 => {new_coords.0 = if new_coords.0 > 0 {new_coords.0- 1}
         else{new_coords.0};},
-        3 => {new_coords.1 = if new_coords.1 < world.dim.1 as isize{new_coords.1 + 1}
+        3 => {new_coords.1 = if new_coords.1 < world.settings_.dim.1 as isize{new_coords.1 + 1}
         else{new_coords.1};},
         _ => {panic!("Not found, move right")}
     }
@@ -58,13 +59,13 @@ pub fn move_fw(bot: &mut Bot, world: &mut World){
 pub fn move_left(bot: &mut Bot, world: &mut World){
     let mut new_coords = (bot.x.clone() as isize, bot.y.clone() as isize);
     match bot.angle {
-        3 => {new_coords.0 = if new_coords.0 < world.dim.0 as isize {new_coords.0 + 1}
+        3 => {new_coords.0 = if new_coords.0 < world.settings_.dim.0 as isize {new_coords.0 + 1}
         else{new_coords.0};},
         0 => {new_coords.1 = if new_coords.1 > 0 {new_coords.1 - 1}
         else{new_coords.1};},
         1 => {new_coords.0 = if new_coords.0 > 0 {new_coords.0- 1}
         else{new_coords.0};},
-        2 => {new_coords.1 = if new_coords.1 < world.dim.1 as isize{new_coords.1 + 1}
+        2 => {new_coords.1 = if new_coords.1 < world.settings_.dim.1 as isize{new_coords.1 + 1}
         else{new_coords.1};},
         _ => {panic!("Not found, move right")}
     }
@@ -76,13 +77,13 @@ pub fn move_left(bot: &mut Bot, world: &mut World){
 pub fn move_right(bot: &mut Bot, world: &mut World){
     let mut new_coords = (bot.x.clone() as isize, bot.y.clone() as isize);
     match bot.angle {
-        1 => {new_coords.0 = if new_coords.0 < world.dim.0 as isize {new_coords.0 + 1}
+        1 => {new_coords.0 = if new_coords.0 < world.settings_.dim.0 as isize {new_coords.0 + 1}
         else{new_coords.0};},
         2 => {new_coords.1 = if new_coords.1 > 0 {new_coords.1 - 1}
         else{new_coords.1};},
         3 => {new_coords.0 = if new_coords.0 > 0 {new_coords.0- 1}
         else{new_coords.0};},
-        0 => {new_coords.1 = if new_coords.1 < world.dim.1 as isize{new_coords.1 + 1}
+        0 => {new_coords.1 = if new_coords.1 < world.settings_.dim.1 as isize{new_coords.1 + 1}
         else{new_coords.1};},
         _ => {panic!("Not found, move right")}
     }
@@ -125,17 +126,17 @@ pub fn neg_y(bot: &mut Bot, world: &mut World){
 pub fn place_barrier_block(bot: &mut Bot, world: &mut World){
     
     let mut rng = rand::thread_rng();
-    if !rng.gen_bool(BARRIER_BLOCK_BLOCKADE){return;}
+    if !rng.gen_bool(world.settings_.barrier_block_blockade){return;}
 
     let mut new_coords = (bot.x.clone() as isize, bot.y.clone() as isize);
     match bot.angle {
-        2 => {new_coords.0 = if new_coords.0 < world.dim.0 as isize {new_coords.0 + 1}
+        2 => {new_coords.0 = if new_coords.0 < world.settings_.dim.0 as isize {new_coords.0 + 1}
         else{new_coords.0};},
         3 => {new_coords.1 = if new_coords.1 > 0 {new_coords.1 - 1}
         else{new_coords.1};},
         0 => {new_coords.0 = if new_coords.0 > 0 {new_coords.0- 1}
         else{new_coords.0};},
-        1 => {new_coords.1 = if new_coords.1 < world.dim.1 as isize{new_coords.1 + 1}
+        1 => {new_coords.1 = if new_coords.1 < world.settings_.dim.1 as isize{new_coords.1 + 1}
         else{new_coords.1};},
         _ => {panic!("Not found, move right")}
     }
@@ -147,25 +148,25 @@ pub fn place_barrier_block(bot: &mut Bot, world: &mut World){
 pub fn mutate(bot: &mut Bot, world: &mut World){
     let mut rng = rand::thread_rng();
     
-    if NEURONAL_MUTATION_ENABLED &&
-    rng.gen_bool(NEURONAL_MUTATION_RATE){
-        neurons::mutate(&mut bot.genome, &world.neuron_lib);
+    if world.settings_.neuronal_mutation_enabled&&
+    rng.gen_bool(world.settings_.neuronal_mutation_rate){
+        neurons::mutate(&mut bot.genome, &world.neuron_lib, &world.settings_);
     }
 }
 
 // modify??
 
 pub fn kill(bot: &mut Bot,world: &mut World){
-    if KILLING_ENABLED{
+    if world.settings_.killing_enabled{
         let mut new_coords = (bot.x.clone() as isize, bot.y.clone() as isize);
         match bot.angle {
-            0 => {new_coords.0 = if new_coords.0 + 1 < world.dim.0 as isize {new_coords.0 + 1}
+            0 => {new_coords.0 = if new_coords.0 + 1 < world.settings_.dim.0 as isize {new_coords.0 + 1}
             else{new_coords.0};},
             1 => {new_coords.1 = if new_coords.1 -1 > 0 {new_coords.1 - 1}
             else{new_coords.1};},
             2 => {new_coords.0 = if new_coords.0 -1 > 0 {new_coords.0- 1}
             else{new_coords.0};},
-            3 => {new_coords.1 = if new_coords.1 + 1 < world.dim.1 as isize{new_coords.1 + 1}
+            3 => {new_coords.1 = if new_coords.1 + 1 < world.settings_.dim.1 as isize{new_coords.1 + 1}
             else{new_coords.1};},
             _ => {panic!("Not found, kill")}
         }

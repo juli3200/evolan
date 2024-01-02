@@ -32,14 +32,14 @@ pub fn population_density(bot: &Bot, world: &World) -> f64{ // 3
     let mut n_blocks = 0;
     
     // Calculate lower and upper bounds for y to prevent overflow
-    let lower_y_bound = (SEARCH_AREA / 2).saturating_sub(bot.y as u32);  // Lower y bound ensuring it doesn't underflow
-    let upper_y_bound = (bot.y as u32 + SEARCH_AREA / 2).min(world.dim.1 as u32);  // Upper y bound limited by world dimensions
+    let lower_y_bound = (world.settings_.search_area / 2).saturating_sub(bot.y as u32);  // Lower y bound ensuring it doesn't underflow
+    let upper_y_bound = (bot.y as u32 + world.settings_.search_area / 2).min(world.settings_.dim.1 as u32);  // Upper y bound limited by world dimensions
 
     // Iterate within the y bounds
     for y in lower_y_bound..upper_y_bound {
         // Calculate lower and upper bounds for x to prevent overflow
-        let lower_x_bound = (SEARCH_AREA / 2).saturating_sub(bot.x as u32);  // Lower x bound ensuring it doesn't underflow
-        let upper_x_bound = (bot.x as u32 + SEARCH_AREA / 2).min(world.dim.0 as u32);  // Upper x bound limited by world dimensions
+        let lower_x_bound = (world.settings_.search_area / 2).saturating_sub(bot.x as u32);  // Lower x bound ensuring it doesn't underflow
+        let upper_x_bound = (bot.x as u32 + world.settings_.search_area / 2).min(world.settings_.dim.0 as u32);  // Upper x bound limited by world dimensions
 
         // Iterate within the x bounds
         for x in lower_x_bound..upper_x_bound {
@@ -54,23 +54,23 @@ pub fn population_density(bot: &Bot, world: &World) -> f64{ // 3
 
     // return ratio 
     // as the value is between 0 and 1 1 is subtracted allowing negative values
-    (n_blocks / (SEARCH_AREA.pow(2)))  as f64 * 2.0 - 1.0
+    (n_blocks / (world.settings_.search_area.pow(2)))  as f64 * 2.0 - 1.0
 }
 
 // how many bots are alive
-pub fn population_size(bot: &Bot, world: &World) -> f64{(world.bots_alive  as f64/ world.n_of_bots as f64) *2.0 -1.0} // 4
+pub fn population_size(bot: &Bot, world: &World) -> f64{(world.bots_alive  as f64/ world.settings_.n_of_bots as f64) *2.0 -1.0} // 4
 
 // every age is identical; stored in world
-pub fn age(bot: &Bot, world: &World) -> f64{(world.age_of_gen as f64/ GENERATION_STEPS as f64) * 2.0 -1.0} // 5
+pub fn age(bot: &Bot, world: &World) -> f64{(world.age_of_gen as f64/ world.settings_.generation_steps as f64) * 2.0 -1.0} // 5
 
 //time of the world
 pub fn time(bot: &Bot, world: &World) -> f64{world.time as f64} // 6
 
 // x coord
-pub fn x(bot: &Bot, world: &World) -> f64{(bot.x as f64/ world.dim.0 as f64) * 2.0 -1.0} // 7
+pub fn x(bot: &Bot, world: &World) -> f64{(bot.x as f64/ world.settings_.dim.0 as f64) * 2.0 -1.0} // 7
 
 // y coord
-pub fn y(bot: &Bot, world: &World) -> f64{(bot.y as f64/ world.dim.1 as f64) * 2.0 -1.0}  // 8
+pub fn y(bot: &Bot, world: &World) -> f64{(bot.y as f64/ world.settings_.dim.1 as f64) * 2.0 -1.0}  // 8
 
 // angle of bot
 pub fn angle(bot: &Bot, world: &World) -> f64{(bot.angle as f64)/ 2.0 - 1.0} // 9
@@ -78,12 +78,12 @@ pub fn angle(bot: &Bot, world: &World) -> f64{(bot.angle as f64)/ 2.0 - 1.0} // 
 // private fn used for all nn functions
 fn nearest_neighbour(bot: &Bot, world: &World) -> Option<(usize, usize)>{
     // not the true nn is returned, because of efficiency
-    for n in 0..(SEARCH_AREA/*size of the searched square*//2) as i32{
+    for n in 0..(world.settings_.search_area/*size of the searched square*//2) as i32{
         for y in -n..n{
             for x in -n..n{
                 // check if in grid
-                if x < 0 || x>world.dim.0 as i32{continue;}
-                else if y < 0 || y>world.dim.1 as i32 {continue;}
+                if x < 0 || x>world.settings_.dim.0 as i32{continue;}
+                else if y < 0 || y>world.settings_.dim.1 as i32 {continue;}
 
                 match world.grid[y as usize][x as usize].guest{
                     Kind::Bot(_) => {return Some((x as usize, y as usize))},
@@ -134,19 +134,19 @@ pub fn angle_nn(bot: &Bot, world: &World) -> f64{ // 11
 
 pub fn distance_nearest_boarder(bot: &Bot, world: &World) -> f64{  // 12
     // create a vec and evaluate the min
-    let lv = *vec![bot.x, bot.y, world.dim.0-bot.x, world.dim.1-bot.y].iter().min().unwrap();
+    let lv = *vec![bot.x, bot.y, world.settings_.dim.0-bot.x, world.settings_.dim.1-bot.y].iter().min().unwrap();
     lv as f64
 }
 
 // relation between northh south -> north 0; south -> 1
 pub fn distance_north_south(bot: &Bot, world: &World) -> f64{ // 13
     // should not divide by zero
-    bot.y as f64/(world.dim.1 as f64 -bot.y as f64)
+    bot.y as f64/(world.settings_.dim.1 as f64 -bot.y as f64)
 }
 
 // relation between west east
 pub fn distance_west_east(bot: &Bot, world: &World) -> f64{ // 14
-    bot.x as f64/(world.dim.0 as f64 -bot.x as f64)
+    bot.x as f64/(world.settings_.dim.0 as f64 -bot.x as f64)
 }
 
 // 0 fw; 1 left 2 bw 3 right -1 none

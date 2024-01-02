@@ -2,8 +2,13 @@ import networkx
 import pandas as pd
 from pyvis.network import Network
 import time
+import sys 
 
-path = "output/"
+path = sys.argv[1]
+
+if not path.isinstance(str):
+    raise TypeError("path must be of type 'str'")
+
 
 df = pd.read_csv(path + "network.csv")
 

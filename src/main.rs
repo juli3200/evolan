@@ -8,6 +8,7 @@ mod tests;
 use world::{objects, neurons, criteria};
 use neurons::GeneTrait;
 
+pub static mut GENOME_LENGTH: usize = 16;
 
 fn main(){
     let p = "/home/julianheer/output/killing".to_string();

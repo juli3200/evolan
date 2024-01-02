@@ -16,7 +16,7 @@ fn area_fn(world: &World, coords: &[(Dow, Dow); 2]) -> (Vec<[u32; crate::setting
     let mut selected_bot_vec: Vec<[u32; crate::settings::GENOME_LENGTH]> = vec![];
 
     // creating image of bots who survived
-    let mut surviers_grid = vec![vec![Kind::Empty; world.dim.0 as usize]; world.dim.1 as usize];
+    let mut surviers_grid = vec![vec![Kind::Empty; world.settings_.dim.0 as usize]; world.settings_.dim.1 as usize];
 
     // create the selected bot_vec
     // iterate over the bots and check if they are in area

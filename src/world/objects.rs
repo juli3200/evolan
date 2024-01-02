@@ -1,7 +1,7 @@
 use rand::Rng;
 
 use super::{neurons::GeneTrait, Kind};
-use crate::{tools, settings};
+use crate::{tools, settings::{self, GENOME_LENGTH, Settings}};
 
 
 // Bot 
@@ -20,18 +20,18 @@ pub struct Bot{
     pub angle: u8,
 
     // genome; hex -> view concept
-    pub genome: [u32; super::GENOME_LENGTH],
+    pub genome: [u32; GENOME_LENGTH],
 
     pub id: u16,
     
 
 }
 
-impl Bot {
+impl  Bot  {
     // the new function creates the Bot without any information except the genome
     // this is because the grid and &world is not known
     // ✅
-    pub fn new(genome: [u32; super::GENOME_LENGTH], id: u16) -> Self{
+    pub fn new(genome: [u32; GENOME_LENGTH], id: u16) -> Self{
         Bot { x: super::Dow::MAX, 
               y: super::Dow::MAX, 
               angle: 0, 
@@ -44,11 +44,11 @@ impl Bot {
     // the genome is provided using the 
     // todo: check
     // update
-    pub fn inherit(parents: (&[u32; crate::settings::GENOME_LENGTH], &[u32; crate::settings::GENOME_LENGTH]), neuron_lib: &Vec<&usize>,  id: u16) -> Self{
+    pub fn inherit(parents: (&[u32; GENOME_LENGTH], &[u32; GENOME_LENGTH]), neuron_lib: &Vec<usize>,  id: u16, settings_: &Settings) -> Self{
         let mut rng = rand::thread_rng();
 
         // create a genome with zeros
-        let mut genome: [u32; super::GENOME_LENGTH] = [0u32; super::GENOME_LENGTH];
+        let mut genome: [u32; GENOME_LENGTH] = [0u32; GENOME_LENGTH];
 
         
         // filling raw genome with random value of parents
@@ -61,9 +61,9 @@ impl Bot {
             c+= 1
         }
 
-        if super::MUTATION_ENABLED{
+        if settings_.mutation_enabled{
             // call the neurons::mutate fn to mutate the genome
-            super::neurons::mutate(&mut genome, neuron_lib);
+            super::neurons::mutate(&mut genome, neuron_lib, settings_);
         }
 
         Self::new(genome, id)
@@ -72,12 +72,12 @@ impl Bot {
     }
 
     // new bot is created as a clone of the old one with mutation
-    pub fn clone_(parent_genome: &[u32; crate::settings::GENOME_LENGTH],  neuron_lib: &Vec<&usize>, id: u16) -> Self{
+    pub fn clone_(parent_genome: &[u32; GENOME_LENGTH],  neuron_lib: &Vec<usize>, id: u16, settings_: &Settings) -> Self{
         let mut genome = parent_genome.clone();
         assert_eq!(genome, *parent_genome);
         
-        if super::MUTATION_ENABLED{
-            super::neurons::mutate(&mut genome, neuron_lib);
+        if settings_.mutation_enabled{
+            super::neurons::mutate(&mut genome, neuron_lib, settings_);
         }
 
         Self::new(genome, id)
@@ -91,7 +91,7 @@ impl Bot {
         self.y = y;
     }
 
-    pub fn neurons_to_compute(&self) -> Vec<Vec<[f64;5]>>{
+    pub fn neurons_to_compute(&self, settings_: &Settings) -> Vec<Vec<[f64;5]>>{
         // this function filters all unused neurons out and sorts them
         /*
         ///
@@ -105,7 +105,7 @@ impl Bot {
         
          */
         // continue here
-        let mut decoded_genome = vec![vec![]; settings::INNER_LAYERS+1];
+        let mut decoded_genome = vec![vec![]; settings_.inner_layers+1];
         for gene in self.genome{
             let a =gene.decode_gene();
             let mut fa = [0.0; 5];
@@ -129,8 +129,8 @@ impl Bot {
         return decoded_genome
     }
 
-    pub fn calculate_input(&self, world: &super::World)-> Vec<Vec<[f64; 5]>>{
-        let mut calc_input_vec = self.neurons_to_compute();
+    pub fn calculate_input(&self, world: &super::World, settings_: &Settings)-> Vec<Vec<[f64; 5]>>{
+        let mut calc_input_vec = self.neurons_to_compute(settings_);
         for neuron in calc_input_vec[0].iter_mut(){
             neuron[0] = super::neurons::INPUT_NEURON_REGISTER[neuron[1] as usize](self, world);
         }
