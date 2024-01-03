@@ -11,13 +11,13 @@ pub const WEIGHT_SUBTRACTION: f64 = 4.0;
 
 pub const GENOME_LENGTH: usize = 16;
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub struct Settings{
     // dimension
     pub dim: (Dow, Dow),
     pub n_of_bots: u16,
     // Length of genomes
-    pub genome_length: usize,
+    pub genome_length: usize, // not supported yet
     // Max val 3; because of gene generation (more bites assigned to the index bits)
     pub inner_layers: usize,
     // Index of output layer
@@ -54,7 +54,7 @@ pub struct Settings{
 }
 
 impl Settings{
-    pub fn use_template(dim:(Dow, Dow), n_of_bots: u16) -> Self{
+    pub fn use_template(dim:(Dow, Dow), n_of_bots: u16, generation_steps: u16) -> Self{
         let inner_layers = 1;
         Settings{
             dim,
@@ -62,15 +62,15 @@ impl Settings{
             genome_length: 16,
             inner_layers,
             output_layer : inner_layers + 1,
-            inner_neurons : 1,
-            mutation_enabled : false,
-            mutation_rate : 0.0001,
-            generation_steps : 60,
+            inner_neurons : 2,
+            mutation_enabled : true,
+            mutation_rate : 0.001,
+            generation_steps,
             comm_radius : 10,
             inherit : true,
             
-            killing_enabled : true,
-            neuronal_mutation_enabled : false,
+            killing_enabled : false,
+            neuronal_mutation_enabled : true,
             neuronal_mutation_rate : 0.0005,
             search_area : 20,
             barrier_block_blockade : 0.0,

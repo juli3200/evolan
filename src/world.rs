@@ -1,4 +1,4 @@
-use std::{process::Output, fmt::write};
+use std::{process::Output, fmt::{write, format}, fs};
 
 use rand::Rng;
 use rayon::{prelude::*, iter::Empty};
@@ -28,7 +28,7 @@ pub struct World{
     pub selection_criteria: criteria::Criteria,
 
     // output path
-    pub path: String,
+    pub name: String,
 
     // generation of the world
     pub generation: usize,
@@ -69,7 +69,7 @@ impl std::fmt::Display for World{
 }
 
 impl World{
-    pub fn new(settings_: settings::Settings, selection_criteria: criteria::Criteria, path: String) -> Self {
+    pub fn new(settings_: settings::Settings, selection_criteria: criteria::Criteria, name: String) -> Self {
         let dim = &settings_.dim;
         let n_of_bots = &settings_.n_of_bots;
 
@@ -105,14 +105,17 @@ impl World{
             grid.push(row);
         }
 
+        // create the path in the cache
+        let _ = fs::create_dir_all(format!("cache/worlds/{name}/generations/"));
+
         World { settings_,
                 selection_criteria,
-                path,
+                name,
                 generation: 0,
                 time: 0,
                 age_of_gen: 0,
                 killed_bots: vec![],
-                bots_alive: settings_.n_of_bots.clone(),
+                bots_alive: settings_.n_of_bots,
                 bot_vec,
                 barrier_block_vec: vec![],
                 grid,
@@ -166,7 +169,7 @@ impl World{
 
     }
 
-    pub fn calculate_step(&mut self){
+    fn calculate_step(&mut self){
         // for every bot in self.bot_vec 
         // the function bot.neurons_to_compute is called
         // this returns a Vec of vecs(one per bot) of vecs(one per necessary gene)

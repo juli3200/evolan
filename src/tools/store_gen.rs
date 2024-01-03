@@ -21,8 +21,7 @@ pub fn store_step(world: &crate::world::World) -> Vec<Vec<Kind>>{
 
 pub fn store_generation(world: &crate::world::World){
     let json_string = to_string(&world.grid_store).unwrap();
-
-    let path = format!("{}/generations/{}.json", world.path, world.generation);
+    let path = format!("cache/worlds/{}/generations/{}.json", world.name, world.generation);
 
     let mut file = File::create(path).unwrap();
     file.write_all(json_string.as_bytes()).unwrap();

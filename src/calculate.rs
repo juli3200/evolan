@@ -24,7 +24,7 @@ pub fn calc_step(input_neurons: &Vec<Vec<[f64; 5]>>, settings_: &Settings) -> Ve
     let inner_layers =settings_.inner_layers;
     // inner layers
     for _ in 0..settings_.inner_layers{
-        output_vec.push(vec![None; inner_layers])
+        output_vec.push(vec![None; settings_.inner_neurons])
     } // end for
     // output layer
     output_vec.push(vec![None; crate::settings::OUTPUT_NEURONS as usize]);
@@ -42,28 +42,29 @@ pub fn calc_step(input_neurons: &Vec<Vec<[f64; 5]>>, settings_: &Settings) -> Ve
             // Calculate the new value
             let calc_val: f64;
 
-
-            match layer{
+            if layer == 0{
                 // if input neuron the input value is taken and multiplied by the weight
-                0 => {calc_val= this_conn[0] *
-                (this_conn[4]/crate::settings::WEIGHT_DIVISION - crate::settings::WEIGHT_SUBTRACTION);},
+                calc_val= this_conn[0] *
+                (this_conn[4]/crate::settings::WEIGHT_DIVISION - crate::settings::WEIGHT_SUBTRACTION);
+            }
+            else if layer >= 1 && layer <= inner_layers {
+                
+                // check if inner neuron is empty=> None or Some()
+                // if None => continue
+                // it's only Some if a input neuron has a connection to the inner neuron
+                match output_vec[layer][this_conn[1] as usize] {
+                    Some(val) => {
+                        calc_val = val * // val times weight
+                            (this_conn[4] / crate::settings::WEIGHT_DIVISION - crate::settings::WEIGHT_SUBTRACTION);},
+                    None => continue }
+                
+            }
 
-                // if inner neuron the val stored in the output_vec is taken and multiplied by the weight
-                // if no val stored => continue
-                1..=inner_layers => {
-                    // check if inner neuron is empty=> None or Some()
-                    // if None => continue
-                    // it's only Some if a input neuron has a connection to the inner neuron
-                    match output_vec[layer ][this_conn[1] as usize] {
-                        Some(val) => {
-                            calc_val = val * // val times weight
-                                (this_conn[4] / crate::settings::WEIGHT_DIVISION - crate::settings::WEIGHT_SUBTRACTION);},
-                        None => continue }
-                    }
+            else {
                 // shouldn't happen
-                _ => {panic!("LAYER NOT FOUND")}
-            
-            } // end match
+                panic!("LAYER NOT FOUND")
+            }
+        
             
             // add calc val to the target neuron
             // if no val stored Some(calc_val) is stored
