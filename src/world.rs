@@ -22,7 +22,7 @@ pub enum Kind{
 
 #[derive(Debug)]
 pub struct World{
-    settings_: settings::Settings,
+    pub settings_: settings::Settings,
 
     // selection criteria can be found in criteria.rs
     pub selection_criteria: criteria::Criteria,
@@ -182,7 +182,7 @@ impl World{
         if !self.settings_.gpu{
             // returns a vec of vec(bot) of output neurons
             output = input_neurons.par_iter().
-            map(|bot| crate::calculate::calc_step(bot)).collect::<Vec<_>>();
+            map(|bot| crate::calculate::calc_step(bot, &self.settings_)).collect::<Vec<_>>();
             
         }
         
@@ -258,9 +258,9 @@ impl World{
                 
 
                 let new_bot = match self.settings_.inherit{
-                    true => objects::Bot::inherit((&b, &b2), &self.neuron_lib, i),
+                    true => objects::Bot::inherit((&b, &b2), &self.neuron_lib, i, &self.settings_),
                 
-                    false => objects::Bot::clone_(&b, &self.neuron_lib, i),
+                    false => objects::Bot::clone_(&b, &self.neuron_lib, i, &self.settings_),
                 };
                
                 new_bot_vec.push(new_bot);

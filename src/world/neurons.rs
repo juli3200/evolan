@@ -3,6 +3,7 @@ use crate::GENOME_LENGTH as GL;
 
 mod input_functions;
 mod output_functions;
+use crate::settings::GENOME_LENGTH;
 // the neuron register is used to convert genes to real values
  
 use crate::{settings::Settings, world::{World, objects::Bot}};
@@ -76,8 +77,8 @@ fn create_gene(lib: &Vec<usize>, settings_: &Settings) -> u32{
 }
 
 // ✅
-pub fn create_genome(neuron_lib: &Vec<usize>, settings_: &Settings) -> Box<[u32]>{
-    let mut gene: Box<[u32]> = Box::new([0u32]);
+pub fn create_genome(neuron_lib: &Vec<usize>, settings_: &Settings) -> [u32; GENOME_LENGTH]{
+    let mut gene: [u32; GENOME_LENGTH] = [0u32; GENOME_LENGTH];
     for g in gene.iter_mut(){
         *g = create_gene(neuron_lib, settings_);
     }

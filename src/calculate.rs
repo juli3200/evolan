@@ -6,7 +6,7 @@ extern "C"{
 */
 // calculates every output neuron of one bot
 
-use rand::seq::index;
+use crate::settings::Settings;
 
 fn sigmoid(x: f64) -> f64 {
     1.0 / (1.0 + (-x).exp())
@@ -17,13 +17,14 @@ fn modified_sigmoid(x:  f64) -> f64 {
 }
 
 
-pub fn calc_step(input_neurons: &Vec<Vec<[f64; 5]>>) -> Vec<usize>{
+pub fn calc_step(input_neurons: &Vec<Vec<[f64; 5]>>, settings_: &Settings) -> Vec<usize>{
 
     // output vec is a vec of every layer where calculation results are stored
     let mut output_vec: Vec<Vec<Option<f64>>> = vec![];
+    let inner_layers =settings_.inner_layers;
     // inner layers
-    for _ in 0..crate::settings::INNER_LAYERS{
-        output_vec.push(vec![None; crate::settings::INNER_NEURONS])
+    for _ in 0..settings_.inner_layers{
+        output_vec.push(vec![None; inner_layers])
     } // end for
     // output layer
     output_vec.push(vec![None; crate::settings::OUTPUT_NEURONS as usize]);
@@ -49,7 +50,7 @@ pub fn calc_step(input_neurons: &Vec<Vec<[f64; 5]>>) -> Vec<usize>{
 
                 // if inner neuron the val stored in the output_vec is taken and multiplied by the weight
                 // if no val stored => continue
-                1..=crate::settings::INNER_LAYERS => {
+                1..=inner_layers => {
                     // check if inner neuron is empty=> None or Some()
                     // if None => continue
                     // it's only Some if a input neuron has a connection to the inner neuron

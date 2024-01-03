@@ -1,3 +1,5 @@
+use std::path::Path;
+
 use rand::Rng;
 
 use super::{neurons::GeneTrait, Kind};
@@ -129,8 +131,8 @@ impl  Bot  {
         return decoded_genome
     }
 
-    pub fn calculate_input(&self, world: &super::World, settings_: &Settings)-> Vec<Vec<[f64; 5]>>{
-        let mut calc_input_vec = self.neurons_to_compute(settings_);
+    pub fn calculate_input(&self, world: &super::World)-> Vec<Vec<[f64; 5]>>{
+        let mut calc_input_vec = self.neurons_to_compute(&world.settings_);
         for neuron in calc_input_vec[0].iter_mut(){
             neuron[0] = super::neurons::INPUT_NEURON_REGISTER[neuron[1] as usize](self, world);
         }
@@ -148,9 +150,9 @@ impl  Bot  {
     }
 
     // ✅
-    pub fn draw_graph(&self){
+    pub fn draw_graph(&self, world: &super::World, path: &str){
         let decoded_genes: Vec<[u32; 5]> = self.genome.map(|gene| gene.decode_gene()).to_vec();
-        tools::plot_network::main(&decoded_genes);
+        tools::plot_network::plot(&decoded_genes, world.settings_.inner_layers, path);
     }
 
 }
