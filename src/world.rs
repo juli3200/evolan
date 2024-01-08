@@ -1,4 +1,4 @@
-use std::{process::Output, fmt::write};
+use std::{process::Output, fmt::{write, format}, fs};
 
 use rand::Rng;
 use rayon::{prelude::*, iter::Empty};
@@ -9,7 +9,7 @@ pub mod neurons;
 pub mod criteria;
 
 // constants
-use crate::{settings::*, tools};
+use crate::{settings::{self, *}, tools};
 
 use self::objects::Bot;
 
@@ -20,22 +20,15 @@ pub enum Kind{
     Empty
 }
 
-
-
-
 #[derive(Debug)]
 pub struct World{
-    //setting dimension of the world; (u8, u8)
-    pub dim: (Dow, Dow),
-
-    //number of bots
-    n_of_bots: u16,
+    pub settings_: settings::Settings,
 
     // selection criteria can be found in criteria.rs
     pub selection_criteria: criteria::Criteria,
 
     // output path
-    pub path: String,
+    pub name: String,
 
     // generation of the world
     pub generation: usize,
@@ -51,7 +44,7 @@ pub struct World{
     // grid with coordinates of object
     pub grid: Vec<Vec<objects::Block>>,
 
-    pub neuron_lib: Vec<&'static usize>,
+    pub neuron_lib: Vec<usize>,
 
     pub grid_store: Vec<Vec<Vec<Kind>>>
 
@@ -68,35 +61,37 @@ unsafe impl Sync for World {}
 impl std::fmt::Display for World{
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut text = String::new();
-        text.push_str(&format!("Bots: {}\n", self.n_of_bots));
-        text.push_str(&format!("Dim: {:?}\n", self.dim));
+        text.push_str(&format!("Bots: {}\n", self.settings_.n_of_bots));
+        text.push_str(&format!("Dim: {:?}\n", self.settings_.dim));
 
         write!(f, "{}", text)
     }
 }
 
 impl World{
-    pub fn new(dim: (Dow, Dow), n_of_bots: u16, selection_criteria: criteria::Criteria, path: String) -> Self {
+    pub fn new(settings_: settings::Settings, selection_criteria: criteria::Criteria, name: String) -> Self {
+        let dim = &settings_.dim;
+        let n_of_bots = &settings_.n_of_bots;
 
         // checking input
         if dim.0 == Dow::MAX || dim.1 == Dow::MAX{panic!("dim.0/dim.1 must be smaller than Dow::Max; buffer needed")}
-        if dim.0 as usize * (dim.1 as usize) < n_of_bots as usize{
+        if dim.0 as usize * (dim.1 as usize) < *n_of_bots as usize{
             panic!("number of objects must be smaller than dim.0*dim.1")}
 
         // the neuron lib is a library which is used for the creation of the genes
-            let mut neuron_lib: Vec<&usize> = Vec::new();
-            neuron_lib.push(&(INPUT_NEURONS as usize));
+            let mut neuron_lib: Vec<usize> = Vec::new();
+            neuron_lib.push((INPUT_NEURONS as usize).clone());
 
-            for _ in 0..INNER_LAYERS{
-                neuron_lib.push(&INNER_NEURONS);
+            for _ in 0..settings_.inner_layers{
+                neuron_lib.push(settings_.inner_neurons.clone());
             }
-            neuron_lib.push(&(OUTPUT_NEURONS as usize));
+            neuron_lib.push((OUTPUT_NEURONS as usize).clone());
         //
 
         // the bot vec contains every bot
             let mut bot_vec: Vec<objects::Bot> = vec![];
-            for i in 0..n_of_bots {
-                bot_vec.push(objects::Bot::new(neurons::create_genome(&neuron_lib), i));
+            for i in 0..*n_of_bots {
+                bot_vec.push(objects::Bot::new(neurons::create_genome(&neuron_lib, &settings_), i));
             }
         //
 
@@ -110,15 +105,17 @@ impl World{
             grid.push(row);
         }
 
-        World { dim,
-                n_of_bots,
+        // create the path in the cache
+        let _ = fs::create_dir_all(format!("cache/worlds/{name}/generations/"));
+
+        World { settings_,
                 selection_criteria,
-                path,
+                name,
                 generation: 0,
                 time: 0,
                 age_of_gen: 0,
                 killed_bots: vec![],
-                bots_alive: n_of_bots,
+                bots_alive: settings_.n_of_bots,
                 bot_vec,
                 barrier_block_vec: vec![],
                 grid,
@@ -130,7 +127,7 @@ impl World{
         // this function adds the barrier blocks
 
         // check input
-        if self.n_of_bots as usize + barrier_blocks_pos.len() + self.barrier_block_vec.len() > self.dim.0 as usize * self.dim.1 as usize{
+        if self.settings_.n_of_bots as usize + barrier_blocks_pos.len() + self.barrier_block_vec.len() > self.settings_.dim.0 as usize * self.settings_.dim.1 as usize{
             panic!("number of objects must be smaller than dim.0*dim.1")
         }
 
@@ -153,8 +150,8 @@ impl World{
 
             // gen coords and check validity
             let coords = loop{
-                let x = rng.gen_range(0..self.dim.0) as usize;
-                let y = rng.gen_range(0..self.dim.1) as usize;
+                let x = rng.gen_range(0..self.settings_.dim.0) as usize;
+                let y = rng.gen_range(0..self.settings_.dim.1) as usize;
 
                 // check coords
                 match self.grid[y][x].guest{
@@ -168,11 +165,11 @@ impl World{
             self.grid[coords.1][coords.0].edit_guest(Kind::Bot(i as u16));
         }
 
-        self.bots_alive = self.n_of_bots;
+        self.bots_alive = self.settings_.n_of_bots;
 
     }
 
-    pub fn calculate_step(&mut self){
+    fn calculate_step(&mut self){
         // for every bot in self.bot_vec 
         // the function bot.neurons_to_compute is called
         // this returns a Vec of vecs(one per bot) of vecs(one per necessary gene)
@@ -185,10 +182,10 @@ impl World{
         // pass to calculate.rs
         // todo: create fn in calculate.rs
         let mut output: Vec<Vec<usize>>  = vec![];
-        if !crate::settings::GPU{
+        if !self.settings_.gpu{
             // returns a vec of vec(bot) of output neurons
             output = input_neurons.par_iter().
-            map(|bot| crate::calculate::calc_step(bot)).collect::<Vec<_>>();
+            map(|bot| crate::calculate::calc_step(bot, &self.settings_)).collect::<Vec<_>>();
             
         }
         
@@ -206,7 +203,7 @@ impl World{
         self.bot_vec = bot_vec_copy;
         self.age_of_gen += 1;
         // disable killing for better performance
-        if KILLING_ENABLED{
+        if self.settings_.killing_enabled{
             self.killed_bots.sort_by(|a, b| b.cmp(a));
             // removing the killed bots from the bot_vec
             for index in self.killed_bots.iter(){
@@ -250,23 +247,23 @@ impl World{
 
         if selected_bot_vec.len() == 0{
 
-            for i in 0..self.n_of_bots{
-                new_bot_vec.push(objects::Bot::new(neurons::create_genome(&self.neuron_lib), i));
+            for i in 0..self.settings_.n_of_bots{
+                new_bot_vec.push(objects::Bot::new(neurons::create_genome(&self.neuron_lib, &self.settings_), i));
             }
 
         }
 
         else{
             
-            for i in 0..self.n_of_bots{
+            for i in 0..self.settings_.n_of_bots{
                 let b = selected_bot_vec[i as usize%selected_bot_vec.len()];
                 let b2 = selected_bot_vec[(i+1) as usize%selected_bot_vec.len()];
                 
 
-                let new_bot = match INHERIT{
-                    true => objects::Bot::inherit((&b, &b2), &self.neuron_lib, i),
+                let new_bot = match self.settings_.inherit{
+                    true => objects::Bot::inherit((&b, &b2), &self.neuron_lib, i, &self.settings_),
                 
-                    false => objects::Bot::clone_(&b, &self.neuron_lib, i),
+                    false => objects::Bot::clone_(&b, &self.neuron_lib, i, &self.settings_),
                 };
                
                 new_bot_vec.push(new_bot);
@@ -291,7 +288,7 @@ impl World{
     }
 
     pub fn calculate_generation(&mut self){
-        for _ in 0..crate::settings::GENERATION_STEPS{
+        for _ in 0..self.settings_.generation_steps{
             self.calculate_step();
         }
    
@@ -299,7 +296,7 @@ impl World{
 
         self.age_of_gen = 0;
         self.generation += 1;
-        self.bots_alive = self.n_of_bots;
+        self.bots_alive = self.settings_.n_of_bots;
 
         tools::store_gen::store_generation(&*self);
         self.grid_store = vec![];
