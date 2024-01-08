@@ -36,10 +36,12 @@ fn archive(name: &str) -> Result<(), Box<dyn std::error::Error>>{
     Ok(())
 }
 
-fn compress(name: &str, path: &str) ->  Result<(), Box<dyn std::error::Error>>{
+pub fn compress(name: &str, path: &str) ->  Result<(), Box<dyn std::error::Error>>{
     // open the previously created tar_file
     let mut tar_file = File::open(format!("cache/worlds/{name}.tar"))?;
+    println!("s");
     let lz4_file = File::create(path)?;
+    println!("s2");
 
     let mut lz4_compressed = lz4_flex::frame::FrameEncoder::new(lz4_file);
 

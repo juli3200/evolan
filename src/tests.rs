@@ -11,11 +11,12 @@ fn test_storing(){
     } 
 }
 
+
 #[test]
 fn test_extracting(){
     use crate::tools::load;
-    let output = &String::from(r"C:\Users\julia\Desktop\test_moving_area2\generations2");
-    let input = &String::from(r"C:\Users\julia\Desktop\test_moving_area2\test.evolan");
+    let output = &String::from(r"C:\Users\julia\Desktop\evolan_sims\killing_a_s");
+    let input = &String::from(r"C:\Users\julia\Desktop\evolan_sims\killing_a_s.evolan");
     match load::load_into_folder(input, output){
         Ok(_) => {},
         Err(e) => {panic!("{e}")}

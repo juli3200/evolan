@@ -1,4 +1,3 @@
-use crate::GENOME_LENGTH as GL;
 use crate::tools::plot_network;
 use crate::world::{Kind, World, objects::Bot, objects::Block, neurons};
 use crate::settings::*;
