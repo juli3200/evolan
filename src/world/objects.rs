@@ -25,6 +25,9 @@ pub struct Bot{
     pub genome: [u32; GENOME_LENGTH],
 
     pub id: u16,
+
+    // is it in cluster?
+    pub cluster: bool,
     
 
 }
@@ -38,7 +41,8 @@ impl  Bot  {
               y: super::Dow::MAX, 
               angle: 0, 
               genome, 
-              id
+              id,
+              cluster: false
               }
     }
 
