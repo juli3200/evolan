@@ -3,7 +3,7 @@
 pub type Dow = u8;
 
 // number of neurons (edit only if neuron is added)
-pub const INPUT_NEURONS: u8 = 17; // number of input neurons; max 32
+pub const INPUT_NEURONS: u8 = 18; // number of input neurons; max 32
 pub const OUTPUT_NEURONS: u8 = 12; // number of output neurons; MAX 32
 
 pub const WEIGHT_DIVISION: f64 = 2_i64.pow(15) as f64;

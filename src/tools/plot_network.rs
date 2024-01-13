@@ -12,7 +12,7 @@ const INPUT_NEURON_REGISTER_STRING: [&str; crate::settings::INPUT_NEURONS as usi
     "input_functions::random", "input_functions::population_density", 
     "input_functions::population_density", "input_functions::population_size",
     "input_functions::age", "input_functions::time", "input_functions::x", 
-    "input_functions::y", "input_functions::distance_nn", "input_functions::angle_nn",
+    "input_functions::y","input_function::angle", "input_functions::distance_nn", "input_functions::angle_nn",
     "input_functions::distance_nearest_boarder", "input_functions::distance_north_south",
     "input_functions::distance_west_east", "input_functions::blocked_angle",
     "input_functions::blocked_around"/* , "input_functions::average_letter", 
