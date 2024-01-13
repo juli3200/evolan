@@ -22,3 +22,11 @@ fn test_extracting(){
         Err(e) => {panic!("{e}")}
     } 
 }
+
+#[test]
+fn cuda_api(){
+    use crate::live_view;
+    unsafe{
+        live_view::hello();
+    }
+}

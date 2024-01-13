@@ -3,6 +3,7 @@ mod world;
 mod calculate;
 mod settings;
 mod tools;
+mod live_view;
 mod tests;
 
 use world::neurons::GeneTrait;
