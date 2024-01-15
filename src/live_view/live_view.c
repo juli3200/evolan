@@ -1,6 +1,12 @@
 #include <stdio.h>
+#include "render.h"
 
-int hello() {
+
+
+
+
+int main() {
     printf("Hello World");
     return 0;
 }
+
