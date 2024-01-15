@@ -1,6 +1,6 @@
 /target
 /.idea
+/.vscode
 /visualizing/__pycache__
 /visualizing/.idea
-/output/*
 /cache/worlds

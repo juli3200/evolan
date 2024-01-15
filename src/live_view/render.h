@@ -5,8 +5,8 @@
 extern "C" {
 #endif
 
-void hello();
-
+unsigned char* render(unsigned char* data, unsigned char* colors, int width, int height);
+unsigned char* cpu_render(unsigned char* data, unsigned char* colors, int width, int height);
 
 #ifdef __cplusplus
 }
