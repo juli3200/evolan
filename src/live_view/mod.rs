@@ -1,9 +1,5 @@
-use cpp;
+
 #[link(name = "live_view")]
 extern {
-    pub fn hello();
+    pub fn main();
 }
-
-cpp!{{
-    #include "src/live_view/live_view.h"
-}}

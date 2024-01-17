@@ -1,18 +1,38 @@
-NVCC = nvcc
+# Makefile for live_view project
 
+# Compiler and flags
+NVCC = nvcc
+CFLAGS = -c
+LDFLAGS =
+
+# Directories
+SRC_DIR = src/live_view
 LIB_DIR = lib
 
-all: $(LIB_DIR)/render_img.exe
+# Source files
+SRCS = $(SRC_DIR)/live_view.c $(SRC_DIR)/render.cu
 
-$(LIB_DIR)/live_view.o: src/live_view/live_view.c src/live_view/render.h
-	$(NVCC) -c $< -o $@
+# Object files
+OBJS = $(LIB_DIR)/lw.o $(LIB_DIR)/r.o
 
-$(LIB_DIR)/render_cu.o: src/live_view/render.cu src/live_view/render.h
-	$(NVCC)  -c $< -o $@
+# Target executable
+TARGET = $(LIB_DIR)/live_view
 
-$(LIB_DIR)/render_img.exe: $(LIB_DIR)/live_view.o $(LIB_DIR)/render_cu.o
-	$(NVCC)  -o $@ $^
+# Build rule for object files
+$(LIB_DIR)/%.o: $(SRC_DIR)/%.c
+	$(NVCC) $(CFLAGS) $< -o $@
 
+$(LIB_DIR)/%.o: $(SRC_DIR)/%.cu
+	$(NVCC) $(CFLAGS) $< -o $@
 
-clean:
-	rm $(LIB_DIR)/*.o
+# Build rule for the target executable
+$(TARGET): $(OBJS)
+	$(NVCC) $(OBJS) -o $(TARGET) $(LDFLAGS)
+
+# Clean rule
+clean_unix:
+	rm -f $(LIB_DIR)/*.o $(TARGET)
+
+# Clean rule for Windows
+clean_win:
+	erase /Q $(LIB_DIR)\*.o

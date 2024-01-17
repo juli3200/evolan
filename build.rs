@@ -1,14 +1,17 @@
-use std::process::Command;
+use std::process::{Command, Output};
 fn main() {
+    let mut outputs: Vec<Output> = vec![];
     
     // Compile the CUDA source file using nvcc
-    let output = Command::new("nvcc")
-        .args(&["--lib", "src/live_view/live_view.cu", "-o", "lib/live_view.lib"])
+    outputs.push(Command::new("make")
+        .args(&["makefile"])
         .output()
-        .expect("Failed to compile live_view.cu with nvcc");
+        .expect("Failed to compile with nvcc"));
 
-    if !output.status.success() {
-        panic!("Failed to compile live_view.cu with nvcc:\n{}", String::from_utf8_lossy(&output.stderr));
+    for o in outputs.into_iter(){
+        if !o.status.success() {
+            panic!("Failed to compile live_view.cu with nvcc:\n{}", String::from_utf8_lossy(&o.stdout));
+        }
     }
 
     // Tell cargo to tell rustc to link the system live_view library.

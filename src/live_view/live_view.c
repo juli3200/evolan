@@ -5,14 +5,14 @@
 
 int main() {
     printf("Hello, World!\n");
-    unsigned char* data = (unsigned char*)malloc(sizeof(unsigned char) * 6000);
+    unsigned char *data = (unsigned char*)malloc(6000);
     for (int i = 0; i < 6000; i++) {
         data[i] = i % 3;
     }
 
     unsigned char colors[9] = {255,1,2,4,255,6,8,9,255};
 
-    unsigned char* pcolors = &colors;
+    unsigned char* pcolors = colors;
 
     // Measure time for render function
     clock_t start_time = clock();

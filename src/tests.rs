@@ -27,6 +27,6 @@ fn test_extracting(){
 fn cuda_api(){
     use crate::live_view;
     unsafe{
-        live_view::hello();
+        live_view::main();
     }
 }
