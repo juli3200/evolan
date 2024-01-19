@@ -4,11 +4,15 @@ version = "0.1.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[workspace]
 
-[[bin]]
-name = "evolanb"
-path = "src/main.rs"
+[lib]
+name = "evolan"
+path = "src/lib.rs"
 
+[[examples]]
+name = "main"
+path = "examples/main.rs"
 
 [dependencies]
 rand = "0.8.5"

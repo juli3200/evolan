@@ -1,5 +1,4 @@
 use rand::{Rng, seq::SliceRandom};
-use crate::GENOME_LENGTH as GL;
 
 mod input_functions;
 mod output_functions;
