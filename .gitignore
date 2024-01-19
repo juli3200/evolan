@@ -1,7 +1,7 @@
 /target
 /.idea
+/.fleet
 /.vscode
 /visualizing/__pycache__
 /visualizing/.idea
-/output
 /cache/worlds
