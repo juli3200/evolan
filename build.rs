@@ -15,9 +15,6 @@ fn main() {
     }*/
 
 
-
-    println!("cargo:rerun-if-env-changed=LIB_RENDER_IMG");
-
     println!("cargo:rustc-link-search=native=lib");
     println!("cargo:rustc-link-lib=static=render_img");
 

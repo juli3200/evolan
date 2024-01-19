@@ -1,12 +1,15 @@
 #include <stdio.h>
 #include "render.h"
 #include <time.h>
+#include <stdlib.h>
 
-
+int test(){
+  return 5;
+}
 int main() {
-    printf("Hello, World!\n");
-    unsigned char *data = (unsigned char*)malloc(6000);
-    for (int i = 0; i < 6000; i++) {
+    size_t LENGTH = 6000;
+    unsigned char *data = (unsigned char*)malloc(LENGTH);
+    for (int i = 0; i < LENGTH; i++) {
         data[i] = i % 3;
     }
 
@@ -39,7 +42,7 @@ int main() {
     // Print the time taken by the cpu_render function
     printf("Time taken by cpu_render: %f seconds\n", cpu_render_time);
 
-    free(data)
+    free(data);
 
     return 0;
 

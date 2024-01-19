@@ -1,6 +1,7 @@
 #include "render.h"
 #include <iostream>
 #include <stdio.h>
+#include <stdlib.h>
 
 __global__ void render_kernel(unsigned char* data, unsigned char* image, unsigned char* colors) {
     const int index = threadIdx.x + threadIdx.y * blockDim.x;

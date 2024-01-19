@@ -4,5 +4,6 @@ pub mod calculate;
 pub mod settings;
 pub mod tools;
 pub mod tests;
+pub mod live_view;
 
 pub use world::neurons::GeneTrait;
