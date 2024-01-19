@@ -1,5 +1,5 @@
-use std::process::{Command, Output};
 fn main() {
+    /*
     let mut outputs: Vec<Output> = vec![];
     
     // Compile the CUDA source file using nvcc
@@ -12,12 +12,14 @@ fn main() {
         if !o.status.success() {
             panic!("Failed to compile live_view.cu with nvcc:\n{}", String::from_utf8_lossy(&o.stdout));
         }
-    }
+    }*/
 
-    // Tell cargo to tell rustc to link the system live_view library.
-    println!("cargo:rustc-link-lib=live_view");
-    // Specify the path to the library
-    println!("cargo:rustc-link-search=native={}", std::env::var("CARGO_MANIFEST_DIR").unwrap() + "/lib");
+
+
+    println!("cargo:rerun-if-env-changed=LIB_RENDER_IMG");
+
+    println!("cargo:rustc-link-search=native=lib");
+    println!("cargo:rustc-link-lib=static=render_img");
 
 
 }

@@ -39,9 +39,9 @@ int main() {
     // Print the time taken by the cpu_render function
     printf("Time taken by cpu_render: %f seconds\n", cpu_render_time);
 
+    free(data)
+
     return 0;
 
-
-    return 0;
 }
 

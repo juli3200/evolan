@@ -1,9 +1,0 @@
-{
-    "files.associations": {
-        "live_view.h": "c",
-        "vector": "c",
-        "xstring": "c",
-        "xutility": "c",
-        "ostream": "cpp"
-    }
-}

@@ -12,6 +12,6 @@
             "program": "cargo",
             "args": ["run"],
         },
-        
+
     ]
 }
