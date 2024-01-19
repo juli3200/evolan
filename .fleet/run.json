@@ -1,0 +1,17 @@
+{
+    "configurations": [
+        {
+            "type": "command",
+            "name": "build",
+            "program": "cargo",
+            "args": ["build"],
+        },
+        {
+            "type": "command",
+            "name": "run",
+            "program": "cargo",
+            "args": ["run"],
+        },
+
+    ]
+}
