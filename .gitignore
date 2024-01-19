@@ -3,5 +3,5 @@
 /.vscode
 /visualizing/__pycache__
 /visualizing/.idea
-/output/*
+/output
 /cache/worlds
