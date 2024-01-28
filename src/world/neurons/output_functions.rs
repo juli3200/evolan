@@ -1,4 +1,3 @@
-use crate::tools::plot_network;
 use crate::world::{Kind, World, objects::Bot, objects::Block, neurons};
 use crate::settings::*;
 use rand::Rng;
