@@ -194,7 +194,7 @@ fn dismantle_cluster(world: &mut World, bot: &mut Bot) {
         return;
     } else if bot.build_cluster {
         bot.build_cluster = false;
-        world.cluster_ready_vec.retain(|&id| id == bot.id);
+        world.cluster_ready_vec.retain(|&id| id != bot.id);
     }
 
 }

@@ -21,10 +21,28 @@ pub struct Cluster{
     // params are evaluated by combining all params of childern
     // eg if cluster has two participants one facinging north and the other facing east
     // the cluster will face norteast
-    angle:u8,
+
+    // all movements vectors are combined to get the cluster movement
+    angle:Option<u8>,
+
+    // if most of participants.built_cluster is false the cluster is deleted
     build_cluster: bool,
+
+}
+
+impl Cluster {
+    pub fn new(participants: Vec<u16>) -> Cluster {
+        Cluster {
+            participants,
+            angle: None,
+            build_cluster: true,
+        }
+    }
+
+    pub fn add_participant(&mut self, bot_index: u16) {
+        self.participants.push(bot_index);
+    }
+
     
-
-
 }
 

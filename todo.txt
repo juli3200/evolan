@@ -1,6 +1,5 @@
 create fn neurons_to_compute in objects.rs
 
-to many inner neurons
 angle nn fix
 
 backwards connections enable
@@ -9,16 +8,14 @@ ask cuda bindings (.lib/.dll)
 
 create the cuda version and GPU accelerated version
 
-create python ui
-
 add 3 dim
 add buildblocks
 add food 
 add unlimited generation time
-https://pyo3.rs/v0.20.0/python_from_rust.html
-add python ui to select blocks 
-then add neurons
-then add calculating system
+
 
 Ask server request and data transmittion
 Ask nearest_neuron
+
+
+Cluster:
