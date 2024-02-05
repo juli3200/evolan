@@ -12,6 +12,8 @@ pub enum Criteria{
     Circle((super::Dow, super::Dow), super::Dow),
     // survive if you built a cluster
     Cluster,
+
+    None,
 }
 
 fn cluster_fn(world: &World) -> (Vec<[u32; crate::settings::GENOME_LENGTH]>, Vec<Vec<Kind>>){
@@ -19,7 +21,7 @@ fn cluster_fn(world: &World) -> (Vec<[u32; crate::settings::GENOME_LENGTH]>, Vec
     let mut surviers_grid = vec![vec![Kind::Empty; world.settings_.dim.0 as usize]; world.settings_.dim.1 as usize];
 
     for bot in world.bot_vec.iter(){
-        if bot.cluster{
+        if bot.cluster.is_some(){
             selected_bot_vec.push(bot.genome.clone());
             surviers_grid[bot.y as usize][bot.x as usize] = Kind::Bot(bot.id);
         }
@@ -72,6 +74,19 @@ fn area_fn(world: &World, coords: &[(Dow, Dow); 2]) -> (Vec<[u32; crate::setting
 
 }
 
+fn none(world: &World) -> (Vec<[u32; crate::settings::GENOME_LENGTH]>, Vec<Vec<Kind>>){
+    let mut selected_bot_vec: Vec<[u32; crate::settings::GENOME_LENGTH]> = vec![];
+    let mut surviers_grid = vec![vec![Kind::Empty; world.settings_.dim.0 as usize]; world.settings_.dim.1 as usize];
+
+    for bot in world.bot_vec.iter(){
+        selected_bot_vec.push(bot.genome.clone());
+        surviers_grid[bot.y as usize][bot.x as usize] = Kind::Bot(bot.id);
+    }
+
+    // selected bot vec is returned to the world select fn
+    (selected_bot_vec, surviers_grid)
+}
+
 impl Criteria{
     // selcect survived bots based on criteris
     pub fn select(&self, world: &World) -> (Vec<[u32; crate::settings::GENOME_LENGTH]>, Vec<Vec<Kind>>){
@@ -79,6 +94,7 @@ impl Criteria{
             Self::Area(coords) => {area_fn(world, coords)},
             Self::Circle(coords, r) => {circle_fn(world, coords, r)}
             Self::Cluster => {cluster_fn(world)}
+            Self::None => {none(world)}
         }
 
     }

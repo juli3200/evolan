@@ -2,13 +2,13 @@ use std::path::Path;
 
 use rand::Rng;
 
-use super::{neurons::GeneTrait, Kind};
+use super::{cluster, neurons::GeneTrait, Kind};
 use crate::{tools, settings::{self, GENOME_LENGTH, Settings}};
 
 
 // Bot 
 #[derive(Debug, Clone)]
-pub struct Bot{
+pub struct Bot<'a>{
     /*
     This struct provides Information about the Bot e.g. genes, pos,...
     */
@@ -27,12 +27,14 @@ pub struct Bot{
     pub id: u16,
 
     // is it in cluster?
-    pub cluster: bool,
+    pub cluster: Option<&'a cluster::Cluster>,
+
+    pub build_cluster: bool,
     
 
 }
 
-impl  Bot  {
+impl <'a> Bot<'a> {
     // the new function creates the Bot without any information except the genome
     // this is because the grid and &world is not known
     // ✅
@@ -42,7 +44,8 @@ impl  Bot  {
               angle: 0, 
               genome, 
               id,
-              cluster: false
+              cluster: Option::None,
+              build_cluster: false,
               }
     }
 

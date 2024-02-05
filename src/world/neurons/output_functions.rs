@@ -177,5 +177,26 @@ pub fn kill(bot: &mut Bot,world: &mut World){
     }
 }
 
+// only making bots ready or unready to build a cluster
+// building and dismantling the cluster is done in world.build_clusters
+
+fn build_cluster(world: &mut World, bot: &mut Bot){
+    if bot.build_cluster{return ();}
+    else if !bot.build_cluster{
+        bot.build_cluster = true;
+        world.cluster_ready_vec.push(bot.id);
+    }
+
+}
+
+fn dismantle_cluster(world: &mut World, bot: &mut Bot) {
+    if !bot.build_cluster {
+        return;
+    } else if bot.build_cluster {
+        bot.build_cluster = false;
+        world.cluster_ready_vec.retain(|&id| id == bot.id);
+    }
+
+}
 
 // comm??!!

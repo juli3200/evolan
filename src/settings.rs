@@ -46,6 +46,7 @@ pub struct Settings{
     // Chance of placing a barrier block when neuron is fired
     pub barrier_block_blockade: f64,
 
+    // unsupported yet
     // Performance flag for GPU
     pub gpu: bool,
     // Backwards connections enabled?
