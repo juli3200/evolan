@@ -13,10 +13,11 @@
 //todo: make input and output functions for clusters
 // make caqlculate for clusters
 
+use super::objects;
+
 #[derive(Clone, Debug)]
 pub struct Cluster{
-    // u16 are indiecies to world.bot_vec
-    participants: Vec<u16>,
+    participants: Vec<*mut objects::Bot>,
 
     // params are evaluated by combining all params of childern
     // eg if cluster has two participants one facinging north and the other facing east
@@ -31,7 +32,7 @@ pub struct Cluster{
 }
 
 impl Cluster {
-    pub fn new(participants: Vec<u16>) -> Cluster {
+    pub fn new(participants: Vec<*mut objects::Bot>) -> Cluster {
         Cluster {
             participants,
             angle: None,
@@ -39,8 +40,8 @@ impl Cluster {
         }
     }
 
-    pub fn add_participant(&mut self, bot_index: u16) {
-        self.participants.push(bot_index);
+    pub fn add_participant(&mut self, bot: *mut objects::Bot) {
+        self.participants.push(bot);
     }
 
     

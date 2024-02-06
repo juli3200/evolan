@@ -7,7 +7,7 @@ use crate::{tools, settings::{self, GENOME_LENGTH, Settings}};
 
 
 // Bot 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Copy)]
 pub struct Bot{
     /*
     This struct provides Information about the Bot e.g. genes, pos,...

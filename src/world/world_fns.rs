@@ -1,5 +1,19 @@
 use super::*;
 
+fn is_valid_pointer<T: std::panic::RefUnwindSafe>(ptr: *mut T) -> bool {
+    if ptr.is_null() {
+        return false;
+    }
+    
+    unsafe {
+        std::panic::catch_unwind(|| {
+            // Using ptr::read to safely read the value behind the pointer
+            let _val = std::ptr::read(ptr);
+        }).is_ok()
+    }
+}
+
+
 // impl for thread sharing
 unsafe impl Sync for World {}
 
@@ -38,6 +52,8 @@ impl World{
             for i in 0..*n_of_bots {
                 bot_vec.push(objects::Bot::new(neurons::create_genome(&neuron_lib, &settings_), i));
             }
+
+            let bot_register: Vec<Option<*mut objects::Bot>> = bot_vec.iter_mut().map(|bot| Some(bot as *mut objects::Bot)).collect();
         //
 
         // the grid is a 2d vec with Blocks in it
@@ -51,7 +67,7 @@ impl World{
         }
 
         // create the path in the cache
-        let _ = fs::create_dir_all(format!("cache/worlds/{name}/generations/"));
+        let _ = fs::create_dir_all(format!(".cache/worlds/{name}/generations/"));
 
         World { settings_,
                 selection_criteria,
@@ -62,6 +78,7 @@ impl World{
                 killed_bots: vec![],
                 bots_alive: settings_.n_of_bots,
                 bot_vec,
+                bot_register,
                 cluster_vec: vec![],
                 cluster_ready_vec: vec![],
                 barrier_block_vec: vec![],
@@ -109,7 +126,7 @@ impl World{
 
             bot.spawn(coords.0 as Dow, coords.1 as Dow);
             // add the raw pointer to the grid
-            self.grid[coords.1][coords.0].edit_guest(Kind::Bot(i as u16));
+            self.grid[coords.1][coords.0].edit_guest(Kind::Bot(bot));
         }
 
         self.bots_alive = self.settings_.n_of_bots;
@@ -151,14 +168,14 @@ impl World{
         self.age_of_gen += 1;
         // disable killing for better performance
         if self.settings_.killing_enabled{
-            self.killed_bots.sort_by(|a, b| b.cmp(a));
             // removing the killed bots from the bot_vec
-            for index in self.killed_bots.iter(){
-                self.bot_vec.remove(*index as usize);
-            }
-            // setting new ids
-            for (index, bot) in self.bot_vec.iter_mut().enumerate(){
-                bot.id = index as u16;
+            for b in self.killed_bots.iter(){
+                if !is_valid_pointer(*b){continue;}
+                let bot = unsafe{&**b};
+                let index = bot.id as usize;
+                let index2 = self.bot_vec.retain(|&b2| *bot != b2);
+
+                self.bot_register[index] = None;
             }
 
             // resetting self.grid
@@ -173,8 +190,8 @@ impl World{
             }
 
             // refilling the grid with the bots
-            for bot in self.bot_vec.iter(){
-                self.grid[bot.y as usize][bot.x as usize].edit_guest(Kind::Bot(bot.id));
+            for bot in self.bot_vec.iter_mut(){
+                self.grid[bot.y as usize][bot.x as usize].edit_guest(Kind::Bot(bot));
             }
             self.killed_bots = vec![];
         }
@@ -187,8 +204,9 @@ impl World{
     }
 
     fn select(&mut self){
+        let sc = self.selection_criteria.clone();
 
-        let (selected_bot_vec, survivors_grid) = self.selection_criteria.select(self);
+        let (selected_bot_vec, survivors_grid) = sc.select(self);
 
         self.grid_store.push(survivors_grid);
 
@@ -243,11 +261,18 @@ impl World{
         
         // build new clusters: 
 
-        fn search_neighbours(world: &mut World, id: u16, neighbours: &mut Vec<u16>){
+        fn search_neighbours(world: &mut World, bot: *mut Bot, neighbours: &mut Vec<*mut Bot>){
             let neighbour_coords = vec![(0, 1), (1, 0), (0, -1), (-1, 0)];
+            // extract the bot from the bot_register 
+            if !is_valid_pointer(bot){return;}
+            let b = unsafe{&*bot};
+
             for n in neighbour_coords.iter(){
-                let x = world.bot_vec[id as usize].x as isize + n.0;
-                let y = world.bot_vec[id as usize].y as isize + n.1;
+            
+
+                // get coords of bot
+                let x = b.x as isize + n.0;
+                let y = b.y as isize + n.1;
                 // check coords ( 0<=x<=dim.0, 0<=y<=dim.1)
                 if x < 0 || x >= world.settings_.dim.0 as isize || y < 0 || y >= world.settings_.dim.1 as isize{
                     continue;
@@ -256,18 +281,22 @@ impl World{
                 // search for neigbours in world.grid
                 match world.grid[y as usize][x as usize].guest{
                 
-                    Kind::Bot(id_of_neighbour) => {
+                    Kind::Bot(neighbour) => {
                         // check if: 
                         // 1. neighbour is ready
                         // 2. neighbour is not already in the neighbours vec
                         // 3. neighbour is not already in a cluster
                         // if all conditions are met, add the id to the neighbours vec
 
-                        if world.bot_vec[id_of_neighbour as usize].build_cluster && !neighbours.contains(&id_of_neighbour) 
-                        && world.bot_vec[id_of_neighbour as usize].cluster.is_none(){
-                            neighbours.push(id_of_neighbour);
+                        if !is_valid_pointer(neighbour){continue;}
+
+                        let neighbour_bot = unsafe{&*neighbour};
+
+                        if neighbour_bot.build_cluster && !neighbours.contains(&neighbour) 
+                        && neighbour_bot.cluster.is_none(){
+                            neighbours.push(neighbour);
                             // search for neighbours of the neighbour with recursion
-                            search_neighbours(world, id_of_neighbour, neighbours);
+                            search_neighbours(world, neighbour, neighbours);
                             }},
                     _ => {}
                 }
@@ -276,31 +305,33 @@ impl World{
 
         let ready_bots = self.cluster_ready_vec.clone();
 
-        for (i, id) in ready_bots.iter().enumerate(){
+        for (i, ptr) in ready_bots.iter().enumerate(){
             // if bots where already added to a cluster, continue
             // this can happen if the bot was added with a bot before
-            if !self.bot_vec[*id as usize].build_cluster{
-                continue;
-            }
+            if !is_valid_pointer(*ptr){continue;}
+
+            let bot = unsafe{&**ptr};
+
+            if !bot.build_cluster{continue;}
 
             // vec of all bots next to the bot who want to form a cluster
-            let mut neighbours: Vec<u16> = vec![];
+            let mut neighbours: Vec<*mut Bot> = vec![];
 
             // check all neighbours and add the id to the neighbours vec with recursion
-            search_neighbours(self, *id, &mut neighbours);
+            search_neighbours(self, *ptr, &mut neighbours);
 
-            if neighbours.len() > 0{
-                // add the id to the neighbours vec
-                neighbours.push(*id);
+            if neighbours.len() > 1{
                 // create a new cluster with the neighbours
                 self.cluster_vec.push(cluster::Cluster::new(neighbours.clone()));
 
                 let cluster_id = self.cluster_vec.len() - 1;
+                println!("{:?}", bot.id);
 
-                for bot in neighbours.iter(){
+                for b in neighbours.into_iter(){
                     // set the cluster of the bot
-                    self.bot_vec[*bot as usize].cluster = Some(cluster_id as u16);
-                    println!("Bot {} is in cluster {}", bot, cluster_id);
+                    if !is_valid_pointer(b){continue;}
+                    unsafe{(*b).cluster = Some(cluster_id as u16)};
+                    println!("Bot {} is in cluster {}", unsafe {(*b).id}, cluster_id);
                 }
 
 

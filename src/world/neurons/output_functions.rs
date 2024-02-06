@@ -184,7 +184,8 @@ pub fn ready_cluster(bot: &mut Bot, world: &mut World){
     if bot.build_cluster{return ();}
     else if !bot.build_cluster{
         bot.build_cluster = true;
-        world.cluster_ready_vec.push(bot.id);
+        let ptr: *mut Bot = bot;
+        world.cluster_ready_vec.push(ptr);
     }
 
 }
@@ -194,7 +195,8 @@ pub fn cancel_cluster(bot: &mut Bot, world: &mut World) {
         return;
     } else if bot.build_cluster {
         bot.build_cluster = false;
-        world.cluster_ready_vec.retain(|&id| id != bot.id);
+        let ptr: *mut Bot = bot;
+        world.cluster_ready_vec.retain(|&id| id != ptr);
     }
 
 }

@@ -17,9 +17,9 @@ use crate::{settings::{self, *}, tools};
 
 use self::objects::Bot;
 
-#[derive(Debug, Clone, Serialize,  Copy)]
+#[derive(Debug, Clone,  Copy)]
 pub enum Kind{
-    Bot(u16),
+    Bot(*mut objects::Bot),
     BarrierBlock,
     Empty
 }
@@ -39,16 +39,19 @@ pub struct World{
     time: u64, // time overall; 
     age_of_gen: u16,
     pub bots_alive: u16, 
-    killed_bots: Vec<u16>,
+    killed_bots: Vec<*mut objects::Bot>,
 
     // holding of the bots and blocks etc
     pub bot_vec: Vec<objects::Bot>,
+
+    pub bot_register: Vec<Option<*mut objects::Bot>>,
+
     // vec of all clusters
     pub cluster_vec: Vec<cluster::Cluster>,
 
     // vec of all bots that are ready to form a cluster
     // id is saved in the vec
-    cluster_ready_vec: Vec<u16>,
+    cluster_ready_vec: Vec<*mut objects::Bot>,
 
     barrier_block_vec: Vec<objects::BarrierBlock>,
 
