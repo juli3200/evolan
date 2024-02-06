@@ -244,6 +244,32 @@ impl <'a>World<'a>{
         // todo: check all ready bots and check if they are next to each other
         // if they are next to each other, they form a cluster
 
+        // vec of all coords of the ready bots
+        let cluster_ready_coords = self.cluster_ready_vec.iter()
+        .map(|id| (self.bot_vec[*id as usize].x, self.bot_vec[*id as usize].y)).collect::<Vec<_>>();
+
+        let neighbour_coords = vec![(0, 1), (1, 0), (0, -1), (-1, 0)];
+
+        for (i, id) in self.cluster_ready_vec.iter().enumerate(){
+            let mut neighbours = vec![];
+            for n in neighbour_coords.iter(){
+                let x = cluster_ready_coords[i].0 as isize + n.0;
+                let y = cluster_ready_coords[i].1 as isize + n.1;
+                if x < 0 || x >= self.settings_.dim.0 as isize || y < 0 || y >= self.settings_.dim.1 as isize{
+                    continue;
+                }
+                ///
+                /// error
+                /// delete this
+                if cluster_ready_coords.contains(&(x as Dow, y as Dow));
+                match self.grid[y as usize][x as usize].guest{
+                    Kind::Bot(id) => neighbours.push(id),
+                    _ => {}
+                }
+            }
+        }
+        
+
     }
 
     pub fn calculate_generation(&mut self){
