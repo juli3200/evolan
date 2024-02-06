@@ -29,7 +29,9 @@ const OUTPUT_NEURON_REGISTER_STRING: [&str; crate::settings::OUTPUT_NEURONS as u
 "output_functions::neg_y",
 "output_functions::place_barrier_block",
 "output_functions::mutate",
-"output_functions::kill"];
+"output_functions::kill",
+"output_functions::ready_cluster",
+"output_functions::cancel_cluster"];
 
 
 fn write_to_csv(data: &Vec<[u32; 5]>, inner_layers: usize) {

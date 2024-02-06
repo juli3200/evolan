@@ -8,7 +8,7 @@ use crate::{tools, settings::{self, GENOME_LENGTH, Settings}};
 
 // Bot 
 #[derive(Debug, Clone)]
-pub struct Bot<'a>{
+pub struct Bot{
     /*
     This struct provides Information about the Bot e.g. genes, pos,...
     */
@@ -27,14 +27,15 @@ pub struct Bot<'a>{
     pub id: u16,
 
     // is it in cluster?
-    pub cluster: Option<&'a cluster::Cluster>,
+    // u16: id in cluster_vec
+    pub cluster: Option<u16>,
 
     pub build_cluster: bool,
     
 
 }
 
-impl <'a> Bot<'a> {
+impl Bot {
     // the new function creates the Bot without any information except the genome
     // this is because the grid and &world is not known
     // ✅

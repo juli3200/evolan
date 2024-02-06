@@ -25,7 +25,7 @@ pub enum Kind{
 }
 
 #[derive(Debug)]
-pub struct World<'a>{
+pub struct World{
     pub settings_: settings::Settings,
 
     // selection criteria can be found in criteria.rs
@@ -42,7 +42,7 @@ pub struct World<'a>{
     killed_bots: Vec<u16>,
 
     // holding of the bots and blocks etc
-    pub bot_vec: Vec<objects::Bot<'a>>,
+    pub bot_vec: Vec<objects::Bot>,
     // vec of all clusters
     pub cluster_vec: Vec<cluster::Cluster>,
 

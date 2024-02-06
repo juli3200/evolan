@@ -180,7 +180,7 @@ pub fn kill(bot: &mut Bot,world: &mut World){
 // only making bots ready or unready to build a cluster
 // building and dismantling the cluster is done in world.build_clusters
 
-fn build_cluster(world: &mut World, bot: &mut Bot){
+pub fn ready_cluster(bot: &mut Bot, world: &mut World){
     if bot.build_cluster{return ();}
     else if !bot.build_cluster{
         bot.build_cluster = true;
@@ -189,7 +189,7 @@ fn build_cluster(world: &mut World, bot: &mut Bot){
 
 }
 
-fn dismantle_cluster(world: &mut World, bot: &mut Bot) {
+pub fn cancel_cluster(bot: &mut Bot, world: &mut World) {
     if !bot.build_cluster {
         return;
     } else if bot.build_cluster {
