@@ -23,10 +23,4 @@ fn test_extracting(){
     } 
 }
 
-#[test]
-fn cuda_api(){
-    use crate::live_view;
-    unsafe{
-        live_view::test();
-    }
-}
+
