@@ -6,7 +6,7 @@ pub static mut GENOME_LENGTH: usize = 16;
 fn main(){
 
     let p = r"C:\Users\julia\Desktop\evolan_sims\killing_a_s";
-    let mut settings_ = settings::Settings::use_template((100,100), 300, 150);
+    let mut settings_ = settings::Settings::use_template((100,100), 300, 50);
     let criteria_ = criteria::Criteria::Area([(0,0), (5,100)]);
 
     settings_.killing_enabled = true;

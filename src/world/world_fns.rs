@@ -344,6 +344,7 @@ impl World{
 
     pub fn calculate_generation(&mut self){
         for _ in 0..self.settings_.generation_steps{
+            println!("{}, {} ", self.age_of_gen, self.bots_alive);
             self.calculate_step();
         }
    
