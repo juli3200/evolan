@@ -170,7 +170,6 @@ pub fn kill(bot: &mut Bot,world: &mut World){
         }
         match world.grid[new_coords.1 as usize][new_coords.0 as usize].guest {
             Kind::Bot(id) =>{
-                world.bots_alive-=1;
                 world.killed_bots.push(id);},
             _ => {}
         }

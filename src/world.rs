@@ -1,4 +1,4 @@
-use std::{process::Output, fmt::{write, format}, fs};
+use std::{process::Output, fmt::{write, format}, fs, ptr};
 
 use rand::Rng;
 use rayon::{prelude::*, iter::Empty};
@@ -22,6 +22,17 @@ pub enum Kind{
     Bot(*mut objects::Bot),
     BarrierBlock,
     Empty
+}
+
+impl Kind{
+    pub fn type_(&self) -> Self{
+        let p: *mut Bot = ptr::null_mut();
+        match *self {
+            Self::Bot(_) => Self::Bot(p),
+            Self::BarrierBlock => Self::BarrierBlock,
+            Self::Empty => Self::Empty
+        }
+    }
 }
 
 #[derive(Debug)]

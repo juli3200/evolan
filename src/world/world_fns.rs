@@ -144,7 +144,6 @@ impl World{
         .collect::<Vec<_>>();
 
         // pass to calculate.rs
-        // todo: create fn in calculate.rs
         let mut output: Vec<Vec<usize>>  = vec![];
         if !self.settings_.gpu{
             // returns a vec of vec(bot) of output neurons
@@ -166,17 +165,27 @@ impl World{
 
         self.bot_vec = bot_vec_copy;
         self.age_of_gen += 1;
+
+        // update clusters
+        self.update_clusters();
+
         // disable killing for better performance
         if self.settings_.killing_enabled{
             // removing the killed bots from the bot_vec
             for b in self.killed_bots.iter(){
                 if !is_valid_pointer(*b){continue;}
                 let bot = unsafe{&**b};
+                // if bot was recently added to cluster continue
+                if bot.cluster.is_some(){continue;}
                 let index = bot.id as usize;
-                let index2 = self.bot_vec.retain(|&b2| *bot != b2);
+                self.bot_vec.retain(|&b2| *bot != b2);
 
                 self.bot_register[index] = None;
+                self.bots_alive -= 1;
             }
+
+            // clearing vec of all corrupted bots and bots in clusters
+            self.killed_bots = vec![];
 
             // resetting self.grid
             for row in self.grid.iter_mut(){
@@ -198,7 +207,6 @@ impl World{
 
         self.grid_store.push(tools::store_gen::store_step(&*self));
 
-        self.update_clusters();
         
         
     }
