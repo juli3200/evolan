@@ -1,3 +1,5 @@
+CONTINUE ON RC::REFCELL
+
 create fn neurons_to_compute in objects.rs
 
 angle nn fix
