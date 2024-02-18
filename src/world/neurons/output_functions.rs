@@ -1,3 +1,5 @@
+use std::cell::RefCell;
+use std::rc::Rc;
 use crate::world::{Kind, World, objects::Bot, objects::Block, neurons};
 use crate::settings::*;
 use rand::Rng;
@@ -37,6 +39,7 @@ fn edit_grid(world: &mut World, bot: &mut Bot, new_coords: (isize, isize), old_c
 }
 
 pub fn move_fw(bot: &mut Bot, world: &mut World){
+
     let mut new_coords = (bot.x.clone() as isize, bot.y.clone() as isize);
     match bot.angle {
         0 => {new_coords.0 = if new_coords.0 < world.settings_.dim.0 as isize {new_coords.0 + 1}
@@ -120,7 +123,7 @@ pub fn neg_y(bot: &mut Bot, world: &mut World){
     }
 }
 
-// places barrier blok behind
+// places barrier block behind
 pub fn place_barrier_block(bot: &mut Bot, world: &mut World){
     
     let mut rng = rand::thread_rng();
@@ -168,9 +171,9 @@ pub fn kill(bot: &mut Bot,world: &mut World){
             else{new_coords.1};},
             _ => {panic!("Not found, kill")}
         }
-        match world.grid[new_coords.1 as usize][new_coords.0 as usize].guest {
+        match &world.grid[new_coords.1 as usize][new_coords.0 as usize].guest {
             Kind::Bot(id) =>{
-                world.killed_bots.push(id);},
+                world.killed_bots.push(Rc::new(RefCell::new(*id.borrow())));},
             _ => {}
         }
     }
@@ -183,7 +186,7 @@ pub fn ready_cluster(bot: &mut Bot, world: &mut World){
     if bot.build_cluster{return ();}
     else if !bot.build_cluster{
         bot.build_cluster = true;
-        let ptr: *mut Bot = bot;
+        let ptr =Rc::new(RefCell::new(*bot));
         world.cluster_ready_vec.push(ptr);
     }
 
@@ -194,8 +197,7 @@ pub fn cancel_cluster(bot: &mut Bot, world: &mut World) {
         return;
     } else if bot.build_cluster {
         bot.build_cluster = false;
-        let ptr: *mut Bot = bot;
-        world.cluster_ready_vec.retain(|&id| id != ptr);
+        world.cluster_ready_vec.retain(|id| id.borrow().id != bot.id);
     }
 
 }

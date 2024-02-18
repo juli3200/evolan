@@ -13,14 +13,13 @@ pub mod cluster;
 mod world_fns;
 use world_fns::*;
 
-// constants
 use crate::{settings::{self, *}, tools};
 
 use self::objects::Bot;
 
-#[derive(Debug, Clone,  Copy)]
+#[derive(Debug, Clone)]
 pub enum Kind{
-    Bot,
+    Bot(Rc<RefCell<Bot>>),
     BarrierBlock,
     Empty
 }
@@ -46,14 +45,14 @@ pub struct World{
     // holding of the bots and blocks etc
     pub bot_vec: Vec<Bot>,
 
-    pub bot_register: Vec<Option<RefCell<Bot>>>,
+    pub bot_register: Vec<Option<Rc<RefCell<Bot>>>>,
 
     // vec of all clusters
     pub cluster_vec: Vec<cluster::Cluster>,
 
     // vec of all bots that are ready to form a cluster
     // id is saved in the vec
-    cluster_ready_vec: Vec<RefCell<Bot>>,
+    cluster_ready_vec: Vec<Rc<RefCell<Bot>>>,
 
     barrier_block_vec: Vec<objects::BarrierBlock>,
 

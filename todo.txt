@@ -22,4 +22,4 @@ Ask nearest_neuron
 
 Cluster:
 // delete cluster ready vec
-replace with vec in update cluster fn whitch searches for all ready alive bots
+replace with vec in update cluster fn whitch searches for already alive bots

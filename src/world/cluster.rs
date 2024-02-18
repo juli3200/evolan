@@ -1,3 +1,6 @@
+use std::rc::Rc;
+use std::cell::{Ref, RefCell};
+use crate::world::objects::Bot;
 ///
 /// clusters are colonies of bots
 /// all decisions are made by all bots together:
@@ -11,13 +14,13 @@
 
 
 //todo: make input and output functions for clusters
-// make caqlculate for clusters
+// make calculate for clusters
 
 use super::objects;
 
 #[derive(Clone, Debug)]
 pub struct Cluster{
-    participants: Vec<*mut objects::Bot>,
+    participants: Vec<Rc<RefCell<Bot>>>,
 
     // params are evaluated by combining all params of childern
     // eg if cluster has two participants one facinging north and the other facing east
@@ -32,7 +35,7 @@ pub struct Cluster{
 }
 
 impl Cluster {
-    pub fn new(participants: Vec<*mut objects::Bot>) -> Cluster {
+    pub fn new(participants: Vec<Rc<RefCell<Bot>>>) -> Cluster {
         Cluster {
             participants,
             angle: None,
@@ -40,7 +43,7 @@ impl Cluster {
         }
     }
 
-    pub fn add_participant(&mut self, bot: *mut objects::Bot) {
+    pub fn add_participant(&mut self, bot: Rc<RefCell<Bot>>) {
         self.participants.push(bot);
     }
 

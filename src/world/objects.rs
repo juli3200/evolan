@@ -50,9 +50,12 @@ impl Bot {
               }
     }
 
-    // with the inherit function it's not neccesary to call the new function
-    // the genome is provided using the 
-    // todo: check
+    pub fn default() -> Self{
+        Self::new([0; GENOME_LENGTH], u16::MAX)
+    }
+
+    // with the inherit function it's not necessary to call the new function
+    // the genome is provided using the
     // update
     pub fn inherit(parents: (&[u32; GENOME_LENGTH], &[u32; GENOME_LENGTH]), neuron_lib: &Vec<usize>,  id: u16, settings_: &Settings) -> Self{
         let mut rng = rand::thread_rng();
@@ -92,6 +95,7 @@ impl Bot {
 
         Self::new(genome, id)
     }
+
 
     // the spawn function adds further information(coordinates) & is called after the World::new() in the World::spawn
     // for the spawn function either the new or the inherit function have already had to be called 

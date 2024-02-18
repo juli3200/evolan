@@ -14,6 +14,9 @@ path = "src/lib.rs"
 name = "main"
 path = "examples/main.rs"
 
+[dev-dependencies]
+rfd = "0.13.0"
+
 [dependencies]
 rand = "0.8.5"
 rayon = "1.8"
