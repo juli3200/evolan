@@ -10,6 +10,10 @@ edition = "2021"
 name = "evolan"
 path = "src/lib.rs"
 
+[tests]
+name = "test1"
+path = "tests/test1.rs"
+
 [[examples]]
 name = "main"
 path = "examples/main.rs"

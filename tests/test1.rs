@@ -1,5 +1,11 @@
 #![cfg(test)]
 
+use fmt::Display;
+use std::fmt;
+use std::fmt::Formatter;
+use evolan::*;
+
+
 #[test]
 fn test_storing(){
     use crate::tools::save;
@@ -21,10 +27,4 @@ fn test_extracting(){
         Ok(_) => {},
         Err(e) => {panic!("{e}")}
     } 
-}
-
-#[test]
-fn cluster(){
-    use crate::world::cluster;
-    
 }

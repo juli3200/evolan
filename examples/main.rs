@@ -17,7 +17,8 @@ fn main(){
         };
 
     let mut settings_ = settings::Settings::use_template((100,100), 300, 50);
-    let criteria_ = criteria::Criteria::Area([(0,0), (5,100)]);
+    //let criteria_ = criteria::Criteria::Area([(0,0), (5,100)]);
+    let criteria_ = criteria::Criteria::ClusterReady;
 
     settings_.killing_enabled = true;
 
@@ -29,6 +30,14 @@ fn main(){
     for i in 0..100{
         main_world.calculate_generation();
         println!("{}", i)
+    }
+
+    main_world.selection_criteria = criteria::Criteria::Cluster;
+
+    for i in 100..200 {
+        main_world.calculate_generation();
+        println!("{}", i)
+        
     }
 
     match tools::save::save("killing_and_storing", &p){

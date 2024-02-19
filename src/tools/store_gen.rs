@@ -29,18 +29,20 @@ fn restructure_grid(world: &crate::world::World) -> Vec<Vec<Vec<(Dow, Dow)>>>{
         // create a vector of bots and barriers 
         let mut bots: Vec<(Dow, Dow)> = vec![];
         let mut barriers: Vec<(Dow, Dow)> = vec![];
+        let mut clusters: Vec<(Dow, Dow)> = vec![];
         
         for (y, row) in world.grid_store[step].iter().enumerate(){
             for (x, block) in row.iter().enumerate(){
                 match block{
                     Kind::Bot(_) => bots.push((x as Dow, y as Dow)),
                     Kind::BarrierBlock => barriers.push((x as Dow, y as Dow)),
+                    Kind::Cluster(_) => clusters.push((x as Dow, y as Dow)),
                     _ => {}
                 }
             }
         }
 
-        list_of_gens.push(vec![bots, barriers]);
+        list_of_gens.push(vec![bots, barriers, clusters]);
         
     }
 

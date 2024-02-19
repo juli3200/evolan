@@ -14,6 +14,8 @@ pub enum Criteria{
     Circle((super::Dow, super::Dow), super::Dow),
     // survive if you built a cluster
     Cluster,
+    // survive if you are ready to build a cluster  
+    ClusterReady,
 
     None,
 }
@@ -24,6 +26,21 @@ fn cluster_fn(world: &mut World) -> (Vec<[u32; crate::settings::GENOME_LENGTH]>,
 
     for bot in world.bot_vec.iter_mut(){
         if bot.cluster.is_some(){
+            selected_bot_vec.push(bot.genome.clone());
+            surviers_grid[bot.y as usize][bot.x as usize] = Kind::Bot(Rc::new(RefCell::new(*bot)));
+        }
+    }
+
+    // selected bot vec is returned to the world select fn
+    (selected_bot_vec, surviers_grid)
+}
+
+fn cluster_ready_fn(world: &mut World) -> (Vec<[u32; crate::settings::GENOME_LENGTH]>, Vec<Vec<Kind>>){
+    let mut selected_bot_vec: Vec<[u32; crate::settings::GENOME_LENGTH]> = vec![];
+    let mut surviers_grid = vec![vec![Kind::Empty; world.settings_.dim.0 as usize]; world.settings_.dim.1 as usize];
+
+    for bot in world.bot_vec.iter_mut(){
+        if bot.build_cluster{
             selected_bot_vec.push(bot.genome.clone());
             surviers_grid[bot.y as usize][bot.x as usize] = Kind::Bot(Rc::new(RefCell::new(*bot)));
         }
@@ -96,6 +113,7 @@ impl Criteria{
             Self::Area(coords) => {area_fn(world, coords)},
             Self::Circle(coords, r) => {circle_fn(world, coords, r)}
             Self::Cluster => {cluster_fn(world)}
+            Self::ClusterReady => {cluster_ready_fn(world)},
             Self::None => {none(world)}
         }
 
