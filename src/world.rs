@@ -19,7 +19,8 @@ use self::objects::Bot;
 
 #[derive(Debug, Clone)]
 pub enum Kind{
-    Bot(Rc<RefCell<Bot>>),
+    Bot(usize), // id of bot for bot register
+    Cluster(usize), // id of bot 
     BarrierBlock,
     Empty
 }
@@ -40,19 +41,18 @@ pub struct World{
     time: u64, // time overall; 
     age_of_gen: u16,
     pub bots_alive: u16, 
-    killed_bots: Vec<Rc<RefCell<Bot>>>,
+    killed_bots: Vec<usize>,
 
     // holding of the bots and blocks etc
     pub bot_vec: Vec<Bot>,
 
-    pub bot_register: Vec<Option<Rc<RefCell<Bot>>>>,
 
     // vec of all clusters
     pub cluster_vec: Vec<cluster::Cluster>,
 
     // vec of all bots that are ready to form a cluster
     // id is saved in the vec
-    cluster_ready_vec: Vec<Rc<RefCell<Bot>>>,
+    cluster_ready_vec: Vec<usize>,
 
     barrier_block_vec: Vec<objects::BarrierBlock>,
 

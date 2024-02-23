@@ -20,7 +20,7 @@ use super::objects;
 
 #[derive(Clone, Debug)]
 pub struct Cluster{
-    participants: Vec<Rc<RefCell<Bot>>>,
+    participants: Vec<usize>,
 
     // params are evaluated by combining all params of childern
     // eg if cluster has two participants one facinging north and the other facing east
@@ -35,7 +35,7 @@ pub struct Cluster{
 }
 
 impl Cluster {
-    pub fn new(participants: Vec<Rc<RefCell<Bot>>>) -> Cluster {
+    pub fn new(participants: Vec<usize>) -> Cluster {
         Cluster {
             participants,
             angle: None,
@@ -43,7 +43,7 @@ impl Cluster {
         }
     }
 
-    pub fn add_participant(&mut self, bot: Rc<RefCell<Bot>>) {
+    pub fn add_participant(&mut self, bot: usize) {
         self.participants.push(bot);
     }
 

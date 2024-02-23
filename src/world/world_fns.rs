@@ -16,6 +16,24 @@ impl std::fmt::Display for World{
     }
 }
 
+impl std::fmt::Display for Bot{
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut text = String::new();
+        text.push_str(&format!("id: {}\n", self.id));
+        text.push_str(&format!("x: {}\n", self.x));
+        text.push_str(&format!("y: {}\n", self.y));
+        text.push_str(&format!("cluster: {:?}\n", self.cluster));
+        text.push_str(&format!("build_cluster: {}\n", self.build_cluster));
+
+        write!(f, "{}", text)
+    }
+
+}
+
+fn find_bot(world: &World, id: usize) -> Option<usize>{
+    world.bot_vec.iter().position(|bot| bot.id == id)
+}
+
 impl World{
     pub fn new(settings_: Settings, selection_criteria: criteria::Criteria, name: String) -> Self {
         let dim = &settings_.dim;
@@ -38,11 +56,10 @@ impl World{
 
         // the bot vec contains every bot
             let mut bot_vec: Vec<Bot> = vec![];
-            for i in 0..*n_of_bots {
+            for i in 0..*n_of_bots as usize {
                 bot_vec.push(Bot::new(neurons::create_genome(&neuron_lib, &settings_), i));
             }
 
-            let bot_register: Vec<Option<Rc<RefCell<Bot>>>> = bot_vec.iter().map(|bot| Some(Rc::new(RefCell::new(*bot)))).collect();
         //
 
         // the grid is a 2d vec with Blocks in it
@@ -67,7 +84,6 @@ impl World{
                 killed_bots: vec![],
                 bots_alive: settings_.n_of_bots,
                 bot_vec,
-                bot_register,
                 cluster_vec: vec![],
                 cluster_ready_vec: vec![],
                 barrier_block_vec: vec![],
@@ -98,6 +114,7 @@ impl World{
     pub fn spawn_bots(&mut self){
         let mut rng = rand::thread_rng();
 
+    
 
         for (i, bot) in self.bot_vec.iter_mut().enumerate(){
 
@@ -115,7 +132,7 @@ impl World{
 
             bot.spawn(coords.0 as Dow, coords.1 as Dow);
             // add the raw pointer to the grid
-            self.grid[coords.1][coords.0].edit_guest(Kind::Bot(Rc::new(RefCell::new(Bot::default()))));
+            self.grid[coords.1][coords.0].edit_guest(Kind::Bot(bot.id));
         }
 
         self.bots_alive = self.settings_.n_of_bots;
@@ -162,17 +179,14 @@ impl World{
         if self.settings_.killing_enabled{
             // removing the killed bots from the bot_vec
             for b in self.killed_bots.iter(){
-                if !Rc::strong_count(b) > 0{continue;}
-                let bot = b.borrow_mut();
-                // if bot was recently added to cluster continue
-                if bot.cluster.is_some(){continue;}
-
-                let index = bot.id as usize;
-                if self.bot_register[index].is_none(){continue;}
-                self.bot_vec.retain(|&b2| *bot != b2);
-
-                self.bot_register[index] = None;
-                self.bots_alive -= 1;
+                if let Some(id) = find_bot(self, *b){
+                    let bot: &Bot = &self.bot_vec[id];
+                    assert_eq!(bot.id, *b);
+                    // if bot was recently added to cluster continue
+                    if bot.cluster.is_some(){continue;}
+                    self.bot_vec.retain(|b2| *b != b2.id);
+                    self.bots_alive -= 1;
+                }
             }
 
             // clearing vec of all corrupted bots and bots in clusters
@@ -183,6 +197,7 @@ impl World{
                 for block in row{
                     match block.guest {
                         Kind::Bot(_) => block.guest = Kind::Empty,
+                        Kind::Cluster(_) => block.guest = Kind::Empty,
                         Kind::Empty => block.guest = Kind::Empty,
                         Kind::BarrierBlock => block.guest = Kind::BarrierBlock
                     }
@@ -190,10 +205,17 @@ impl World{
             }
 
             // refilling the grid with the bots
-            for bot in self.bot_vec.iter_mut(){
-                self.grid[bot.y as usize][bot.x as usize].edit_guest(Kind::Bot(Rc::new(RefCell::new(*bot))));
+            for bot in self.bot_vec.iter(){
+                match bot.cluster{
+                    Some(_) => {
+                        self.grid[bot.y as usize][bot.x as usize].edit_guest(Kind::Cluster(bot.id));
+                    },
+                    None => {
+                        self.grid[bot.y as usize][bot.x as usize].edit_guest(Kind::Bot(bot.id));
+                    }
+                    
+                }
             }
-            self.killed_bots = vec![];
         }
 
         self.grid_store.push(tools::store_gen::store_step(&*self));
@@ -213,7 +235,7 @@ impl World{
 
         if selected_bot_vec.len() == 0{
 
-            for i in 0..self.settings_.n_of_bots{
+            for i in 0..self.settings_.n_of_bots as usize{
                 new_bot_vec.push(objects::Bot::new(neurons::create_genome(&self.neuron_lib, &self.settings_), i));
             }
 
@@ -221,9 +243,9 @@ impl World{
 
         else{
             
-            for i in 0..self.settings_.n_of_bots{
-                let b = selected_bot_vec[i as usize%selected_bot_vec.len()];
-                let b2 = selected_bot_vec[(i+1) as usize%selected_bot_vec.len()];
+            for i in 0..self.settings_.n_of_bots as usize{
+                let b = selected_bot_vec[i%selected_bot_vec.len()];
+                let b2 = selected_bot_vec[(i+1)%selected_bot_vec.len()];
                 
 
                 let new_bot = match self.settings_.inherit{
@@ -244,6 +266,7 @@ impl World{
             for block in row{
                 match block.guest {
                     Kind::Bot(_) => block.guest = Kind::Empty,
+                    Kind::Cluster(_) => block.guest = Kind::Empty,
                     Kind::Empty => block.guest = Kind::Empty,
                     Kind::BarrierBlock => block.guest = Kind::BarrierBlock
                 }
@@ -260,18 +283,27 @@ impl World{
         
         // build new clusters: 
 
-        fn search_neighbours(world: &mut World, bot: &Rc<RefCell<Bot>>, neighbours: &mut Vec<Rc<RefCell<Bot>>>){
+        fn search_neighbours(world: &World, bot_index: usize, neighbours: &mut Vec<usize>){
             let neighbour_coords = vec![(0, 1), (1, 0), (0, -1), (-1, 0)];
+            
             // extract the bot from the bot_register
-            if !Rc::strong_count(bot) > 0{return;}
-            let b = bot.borrow();
+
+            // check if bot is dead (should not happen, but just in case)
+            let bot;
+            if let Some(id) = find_bot(world, bot_index){
+                bot = &world.bot_vec[id];
+                assert_eq!(bot.id, bot_index);}
+
+            else {
+                return;
+            }
 
             for n in neighbour_coords.iter(){
             
 
                 // get coords of bot
-                let x = b.x as isize + n.0;
-                let y = b.y as isize + n.1;
+                let x = bot.x as isize + n.0;
+                let y = bot.y as isize + n.1;
                 // check coords ( 0<=x<=dim.0, 0<=y<=dim.1)
                 if x < 0 || x >= world.settings_.dim.0 as isize || y < 0 || y >= world.settings_.dim.1 as isize{
                     continue;
@@ -288,56 +320,73 @@ impl World{
                         // 2. neighbour is not already in the neighbours vec
                         // 3. neighbour is not already in a cluster
                         // if all conditions are met, add the id to the neighbours vec
+                        if world.generation == 30 && world.age_of_gen == 20{
+                            println!("{}", *bot)
+                        }
+                        if let Some(neighbour_bot) =  find_bot(world, neighbour){
+                            let neighbour_bot: &Bot = &world.bot_vec[neighbour_bot];
+                            if world.generation == 30 && world.age_of_gen == 20{
+                                println!("{}", *neighbour_bot)
+                            }
+                            if neighbour_bot.build_cluster && !neighbours.contains(&neighbour) && neighbour_bot.cluster.is_none() {
+                                neighbours.push(neighbour);
+                                // search for neighbours of the neighbour with recursion
+                                search_neighbours(world, neighbour, neighbours);
+                            }
+                        }},
 
-                        if {let neighbour_bot= neighbour.borrow();
-                            neighbour_bot.build_cluster && !neighbours.contains(&neighbour)
-                        && neighbour_bot.cluster.is_none()}
-
-                        {
-
-                            neighbours.push(Rc::new(RefCell::new(*neighbour.borrow())));
-                            // search for neighbours of the neighbour with recursion
-                            search_neighbours(world, &neighbour, neighbours);
-                            }},
+                        
                     _ => {}
                 }
             }
+            
+            
+
         }
 
         let ready_bots = self.cluster_ready_vec.clone();
 
-        for (i, ptr) in ready_bots.iter().enumerate(){
+        for id in ready_bots.iter(){
             // if bots where already added to a cluster, continue
             // this can happen if the bot was added with a bot before
+            let bot;
 
-            let bot = ptr.borrow();
+            if let Some(bot_index) = find_bot(self, *id){
+                bot = &self.bot_vec[bot_index];
+            }
+            else {
+                continue;
+            }
 
-            if !bot.build_cluster{continue;}
+
+            if !bot.build_cluster{println!("{}", *bot);continue;}
 
             // vec of all bots next to the bot who want to form a cluster
-            let mut neighbours: Vec<Rc<RefCell<Bot>>> = vec![];
+            let mut neighbours: Vec<usize> = vec![];
 
             // check all neighbours and add the id to the neighbours vec with recursion
-            search_neighbours(self, ptr, &mut neighbours);
+            search_neighbours(self, *id, &mut neighbours);
 
             if neighbours.len() > 1{
                 // create a new cluster with the neighbours
                 self.cluster_vec.push(cluster::Cluster::new(neighbours.clone()));
 
                 let cluster_id = self.cluster_vec.len() - 1;
-                println!("{:?}", bot.id);
 
                 for b in neighbours.into_iter(){
+                    
                     // set the cluster of the bot
-                    b.borrow_mut().cluster = Some(cluster_id as u16);
-                    println!("Bot {} is in cluster {}", b.borrow().id, cluster_id);
+                    if let Some(b_index) = find_bot(self, b){
+
+                        self.bot_vec[b_index].cluster = Some(cluster_id);
+                        //println!("Bot {} is in cluster {}", self.bot_vec[b_index].id, cluster_id);
+                    }
                 }
 
 
             }
-            
-        }
-        
+        } 
+              
 
     }
 

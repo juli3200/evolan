@@ -24,11 +24,11 @@ pub struct Bot{
     // genome; hex -> view concept
     pub genome: [u32; GENOME_LENGTH],
 
-    pub id: u16,
+    pub id: usize,
 
     // is it in cluster?
     // u16: id in cluster_vec
-    pub cluster: Option<u16>,
+    pub cluster: Option<usize>,
 
     pub build_cluster: bool,
     
@@ -39,7 +39,7 @@ impl Bot {
     // the new function creates the Bot without any information except the genome
     // this is because the grid and &world is not known
     // ✅
-    pub fn new(genome: [u32; GENOME_LENGTH], id: u16) -> Self{
+    pub fn new(genome: [u32; GENOME_LENGTH], id: usize) -> Self{
         Bot { x: super::Dow::MAX, 
               y: super::Dow::MAX, 
               angle: 0, 
@@ -51,13 +51,13 @@ impl Bot {
     }
 
     pub fn default() -> Self{
-        Self::new([0; GENOME_LENGTH], u16::MAX)
+        Self::new([0; GENOME_LENGTH], usize::MAX)
     }
 
     // with the inherit function it's not necessary to call the new function
     // the genome is provided using the
     // update
-    pub fn inherit(parents: (&[u32; GENOME_LENGTH], &[u32; GENOME_LENGTH]), neuron_lib: &Vec<usize>,  id: u16, settings_: &Settings) -> Self{
+    pub fn inherit(parents: (&[u32; GENOME_LENGTH], &[u32; GENOME_LENGTH]), neuron_lib: &Vec<usize>,  id: usize, settings_: &Settings) -> Self{
         let mut rng = rand::thread_rng();
 
         // create a genome with zeros
@@ -85,7 +85,7 @@ impl Bot {
     }
 
     // new bot is created as a clone of the old one with mutation
-    pub fn clone_(parent_genome: &[u32; GENOME_LENGTH],  neuron_lib: &Vec<usize>, id: u16, settings_: &Settings) -> Self{
+    pub fn clone_(parent_genome: &[u32; GENOME_LENGTH],  neuron_lib: &Vec<usize>, id: usize, settings_: &Settings) -> Self{
         let mut genome = parent_genome.clone();
         assert_eq!(genome, *parent_genome);
         

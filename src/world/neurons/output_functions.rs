@@ -1,4 +1,5 @@
 use std::cell::RefCell;
+use std::clone;
 use std::rc::Rc;
 use crate::world::{Kind, World, objects::Bot, objects::Block, neurons};
 use crate::settings::*;
@@ -173,7 +174,7 @@ pub fn kill(bot: &mut Bot,world: &mut World){
         }
         match &world.grid[new_coords.1 as usize][new_coords.0 as usize].guest {
             Kind::Bot(id) =>{
-                world.killed_bots.push(Rc::new(RefCell::new(*id.borrow())));},
+                world.killed_bots.push(bot.id);},
             _ => {}
         }
     }
@@ -186,8 +187,8 @@ pub fn ready_cluster(bot: &mut Bot, world: &mut World){
     if bot.build_cluster{return ();}
     else if !bot.build_cluster{
         bot.build_cluster = true;
-        let ptr =Rc::new(RefCell::new(*bot));
-        world.cluster_ready_vec.push(ptr);
+        let id = bot.id .clone();
+        world.cluster_ready_vec.push(id);
     }
 
 }
@@ -197,7 +198,7 @@ pub fn cancel_cluster(bot: &mut Bot, world: &mut World) {
         return;
     } else if bot.build_cluster {
         bot.build_cluster = false;
-        world.cluster_ready_vec.retain(|id| id.borrow().id != bot.id);
+        world.cluster_ready_vec.retain(|&b| b != bot.id);
     }
 
 }

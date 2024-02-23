@@ -19,7 +19,7 @@ name = "main"
 path = "examples/main.rs"
 
 [dev-dependencies]
-rfd = "0.13.0"
+rfd = "0.14.0"
 
 [dependencies]
 rand = "0.8.5"

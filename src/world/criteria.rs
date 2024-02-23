@@ -27,7 +27,7 @@ fn cluster_fn(world: &mut World) -> (Vec<[u32; crate::settings::GENOME_LENGTH]>,
     for bot in world.bot_vec.iter_mut(){
         if bot.cluster.is_some(){
             selected_bot_vec.push(bot.genome.clone());
-            surviers_grid[bot.y as usize][bot.x as usize] = Kind::Bot(Rc::new(RefCell::new(*bot)));
+            surviers_grid[bot.y as usize][bot.x as usize] = Kind::Bot(bot.id);
         }
     }
 
@@ -42,7 +42,7 @@ fn cluster_ready_fn(world: &mut World) -> (Vec<[u32; crate::settings::GENOME_LEN
     for bot in world.bot_vec.iter_mut(){
         if bot.build_cluster{
             selected_bot_vec.push(bot.genome.clone());
-            surviers_grid[bot.y as usize][bot.x as usize] = Kind::Bot(Rc::new(RefCell::new(*bot)));
+            surviers_grid[bot.y as usize][bot.x as usize] = Kind::Bot(bot.id);
         }
     }
 
@@ -62,7 +62,7 @@ fn circle_fn(world: &mut World, coords: &(Dow, Dow), r:&Dow) -> (Vec<[u32; crate
         if (((coords.0 - bot.x as i64).pow(2) +
         (coords.1 - bot.y as i64).pow(2)) as f64).sqrt() < r{
             selected_bot_vec.push(bot.genome.clone());
-            surviers_grid[bot.y as usize][bot.x as usize] = Kind::Bot(Rc::new(RefCell::new(*bot)));
+            surviers_grid[bot.y as usize][bot.x as usize] = Kind::Bot(bot.id);
         }
     }
 
@@ -83,7 +83,7 @@ fn area_fn(world: &mut World, coords: &[(Dow, Dow); 2]) -> (Vec<[u32; crate::set
     for bot in world.bot_vec.iter_mut(){
         if /*y coord*/(bot.y >= coords[0].1 && bot.y < coords[1].1) &&  (bot.x >= coords[0].0 && bot.x < coords[1].0){
             selected_bot_vec.push(bot.genome.clone());
-            surviers_grid[bot.y as usize][bot.x as usize] = Kind::Bot(Rc::new(RefCell::new(*bot)));
+            surviers_grid[bot.y as usize][bot.x as usize] = Kind::Bot(bot.id);
         }
     }
 
@@ -99,7 +99,7 @@ fn none(world: &mut World) -> (Vec<[u32; crate::settings::GENOME_LENGTH]>, Vec<V
 
     for bot in world.bot_vec.iter_mut(){
         selected_bot_vec.push(bot.genome.clone());
-        surviers_grid[bot.y as usize][bot.x as usize] = Kind::Bot(Rc::new(RefCell::new(*bot)));
+        surviers_grid[bot.y as usize][bot.x as usize] = Kind::Bot(bot.id);
     }
 
     // selected bot vec is returned to the world select fn

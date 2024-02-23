@@ -1,8 +1,7 @@
 #![cfg(test)]
 
-use fmt::Display;
-use std::fmt;
-use std::fmt::Formatter;
+
+
 use evolan::*;
 
 
