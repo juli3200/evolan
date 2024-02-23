@@ -17,13 +17,13 @@ fn archive(name: &str) -> Result<(), Box<dyn std::error::Error>>{
     // indicates that it isn't compressed
     // is stored in the cache
 
-    let tar_file =File::create(format!("cache/worlds/{name}.tar"))?;
+    let tar_file =File::create(format!(".cache/worlds/{name}.tar"))?;
 
     let mut archive = Builder::new(tar_file);
 
 
      // Iterate through the directory and add files to the TAR archive
-     for entry in WalkDir::new(format!("cache/worlds/{name}")).into_iter().filter_map(|e| e.ok()) {
+     for entry in WalkDir::new(format!(".cache/worlds/{name}")).into_iter().filter_map(|e| e.ok()) {
         let path = entry.path();
         if path.is_file() {
             let file_name = path.file_name().unwrap().to_string_lossy().into_owned();
@@ -38,7 +38,7 @@ fn archive(name: &str) -> Result<(), Box<dyn std::error::Error>>{
 
 pub fn compress(name: &str, path: &str) ->  Result<(), Box<dyn std::error::Error>>{
     // open the previously created tar_file
-    let mut tar_file = File::open(format!("cache/worlds/{name}.tar"))?;
+    let mut tar_file = File::open(format!(".cache/worlds/{name}.tar"))?;
     println!("s");
     let lz4_file = File::create(path)?;
     println!("s2");
@@ -51,7 +51,7 @@ pub fn compress(name: &str, path: &str) ->  Result<(), Box<dyn std::error::Error
 
     drop(tar_file);
 
-    std::fs::remove_file(format!("cache/worlds/{name}.tar"))?;
+    std::fs::remove_file(format!(".cache/worlds/{name}.tar"))?;
 
     Ok(())
 }

@@ -1,3 +1,6 @@
+use std::cell::RefCell;
+use std::clone;
+use std::rc::Rc;
 use crate::world::{Kind, World, objects::Bot, objects::Block, neurons};
 use crate::settings::*;
 use rand::Rng;
@@ -37,6 +40,7 @@ fn edit_grid(world: &mut World, bot: &mut Bot, new_coords: (isize, isize), old_c
 }
 
 pub fn move_fw(bot: &mut Bot, world: &mut World){
+
     let mut new_coords = (bot.x.clone() as isize, bot.y.clone() as isize);
     match bot.angle {
         0 => {new_coords.0 = if new_coords.0 < world.settings_.dim.0 as isize {new_coords.0 + 1}
@@ -120,7 +124,7 @@ pub fn neg_y(bot: &mut Bot, world: &mut World){
     }
 }
 
-// places barrier blok behind
+// places barrier block behind
 pub fn place_barrier_block(bot: &mut Bot, world: &mut World){
     
     let mut rng = rand::thread_rng();
@@ -168,14 +172,35 @@ pub fn kill(bot: &mut Bot,world: &mut World){
             else{new_coords.1};},
             _ => {panic!("Not found, kill")}
         }
-        match world.grid[new_coords.1 as usize][new_coords.0 as usize].guest {
+        match &world.grid[new_coords.1 as usize][new_coords.0 as usize].guest {
             Kind::Bot(id) =>{
-                world.bots_alive-=1;
-                world.killed_bots.push(id);},
+                world.killed_bots.push(bot.id);},
             _ => {}
         }
     }
 }
 
+// only making bots ready or unready to build a cluster
+// building and dismantling the cluster is done in world.build_clusters
+
+pub fn ready_cluster(bot: &mut Bot, world: &mut World){
+    if bot.build_cluster{return ();}
+    else if !bot.build_cluster{
+        bot.build_cluster = true;
+        let id = bot.id .clone();
+        world.cluster_ready_vec.push(id);
+    }
+
+}
+
+pub fn cancel_cluster(bot: &mut Bot, world: &mut World) {
+    if !bot.build_cluster {
+        return;
+    } else if bot.build_cluster {
+        bot.build_cluster = false;
+        world.cluster_ready_vec.retain(|&b| b != bot.id);
+    }
+
+}
 
 // comm??!!

@@ -2,7 +2,7 @@ use std::{fs::File, io};
 use tar::Archive;
 use lz4_flex;
 
-static TAR_PATH: &str ="cache/0.evolan1";
+static TAR_PATH: &str =".cache/0.evolan1";
 
 fn extract_archive(output_path: &String) -> Result<(), Box<dyn std::error::Error>> {
     let tar_file = File::open(TAR_PATH)?;

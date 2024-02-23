@@ -1,13 +1,24 @@
 use evolan::*;
 use evolan::world::criteria;
-
+use rfd::FileDialog;
 pub static mut GENOME_LENGTH: usize = 16;
 
 fn main(){
 
-    let p = r"C:\Users\julia\Desktop\evolan_sims\killing_a_s";
-    let mut settings_ = settings::Settings::use_template((100,100), 300, 150);
-    let criteria_ = criteria::Criteria::Area([(0,0), (5,100)]);
+    let file = FileDialog::new()
+        .add_filter("evolan", &["evolan"])
+        .save_file();
+
+    println!("{:?}", file);
+
+    let p: String =  match file {
+            Some(p_) => {p_.display().to_string()},
+            None => panic!("select valid filename")
+        };
+
+    let mut settings_ = settings::Settings::use_template((100,100), 300, 50);
+    //let criteria_ = criteria::Criteria::Area([(0,0), (5,100)]);
+    let criteria_ = criteria::Criteria::ClusterReady;
 
     settings_.killing_enabled = true;
 
@@ -21,7 +32,15 @@ fn main(){
         println!("{}", i)
     }
 
-    match tools::save::save("killing_and_storing", p){
+    main_world.selection_criteria = criteria::Criteria::Cluster;
+
+    for i in 100..200 {
+        main_world.calculate_generation();
+        println!("{}", i)
+        
+    }
+
+    match tools::save::save("killing_and_storing", &p){
         Ok(_) => {println!("saved! ")},
         Err(e) => {println!("{e}"); panic!("{e}")}
     }
@@ -44,7 +63,5 @@ fn main(){
     }
     //main_world.bot_vec[0].draw_graph();
     */
-
-
 
 }

@@ -4,5 +4,5 @@
 /.vscode
 /visualizing/__pycache__
 /visualizing/.idea
-/cache/worlds
+/.cache/worlds
 /venv

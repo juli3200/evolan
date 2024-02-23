@@ -151,7 +151,7 @@ pub fn distance_west_east(bot: &Bot, world: &World) -> f64{ // 14
 
 // 0 fw; 1 left 2 bw 3 right -1 none
 pub fn blocked_angle(bot: &Bot, world: &World) -> f64{ // 15
-    // every coordinate whitch needs to be checked
+    // every coordinate which needs to be checked
     let coords = vec![(bot.x as i32+1, bot.y as i32), (bot.x as i32, bot.y as i32+1), 
     (bot.x as i32-1, bot.y as i32), (bot.x as i32-1, bot.y as i32)];
 
@@ -183,7 +183,7 @@ pub fn blocked_around(bot: &Bot, world: &World) -> f64{ // 16
 
 
 /* 
-// sums  up all letters and returns ceiled average
+// sums  up all letters and returns rounded average
 pub fn average_letter(bot: &Bot, world: &World) -> f64{ // 17
     let letters = &world.grid[bot.y as usize][bot.x as usize].letters;
     let sum = world.grid[bot.y as usize][bot.x as usize].letters.iter().sum::<u8>() as f64;

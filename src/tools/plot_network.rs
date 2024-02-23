@@ -29,14 +29,16 @@ const OUTPUT_NEURON_REGISTER_STRING: [&str; crate::settings::OUTPUT_NEURONS as u
 "output_functions::neg_y",
 "output_functions::place_barrier_block",
 "output_functions::mutate",
-"output_functions::kill"];
+"output_functions::kill",
+"output_functions::ready_cluster",
+"output_functions::cancel_cluster"];
 
 
 fn write_to_csv(data: &Vec<[u32; 5]>, inner_layers: usize) {
-    let _ = fs::remove_file("cache/network.csv");
+    let _ = fs::remove_file(".cache/network.csv");
     // from chat.openai.com
     // Open the file, creating it if it doesn't exist, and emptying it if it does
-    let mut file = File::create("cache/network.csv").expect("Unable to create file");
+    let mut file = File::create(".cache/network.csv").expect("Unable to create file");
 
     // Write the data to the CSV file
     writeln!(file, "Source,Target,weight").expect("Unable to write data to file");

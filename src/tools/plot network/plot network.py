@@ -11,7 +11,7 @@ if not path.isinstance(str):
     raise TypeError("path must be of type 'str'")
 
 
-df = pd.read_csv("cache/network.csv")
+df = pd.read_csv(".cache/network.csv")
 
 G = networkx.from_pandas_edgelist(df,
                                   source="Source",
