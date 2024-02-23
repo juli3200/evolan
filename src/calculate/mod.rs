@@ -1,11 +1,3 @@
-
-/*
-extern "C"{
-    fn calculate(a: i32);
-}
-*/
-// calculates every output neuron of one bot
-
 use crate::settings::Settings;
 
 fn sigmoid(x: f64) -> f64 {
@@ -17,7 +9,7 @@ fn modified_sigmoid(x:  f64) -> f64 {
 }
 
 
-pub fn calc_step(input_neurons: &Vec<Vec<[f64; 5]>>, settings_: &Settings) -> Vec<usize>{
+pub fn calc_step(input_neurons: &Vec<Vec<[f64; 5]>>, settings_: &Settings) -> Vec<Option<f64>>{
 
     // output vec is a vec of every layer where calculation results are stored
     let mut output_vec: Vec<Vec<Option<f64>>> = vec![];
@@ -93,19 +85,10 @@ pub fn calc_step(input_neurons: &Vec<Vec<[f64; 5]>>, settings_: &Settings) -> Ve
         }
     } // end outer for (layers)
 
-    let mut activated_outputs = vec![];
+    let output_neurons = output_vec[output_vec.len()-1].clone();
 
 
-    // access output layer from the output_vec
-    for (index, output_neuron) in output_vec[output_vec.len()-1].iter().enumerate(){
-        match output_neuron {
-            Some(val) => {if *val >= 0.0{activated_outputs.push(index);}}
-            None => continue
-        }
-    }
-
-
-    activated_outputs
+    output_neurons
 
 }
 

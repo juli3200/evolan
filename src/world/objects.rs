@@ -155,9 +155,12 @@ impl Bot {
 
     }
 
-    pub fn react(&mut self, world: &mut super::World, output: &Vec<usize>){
-        for neuron in output{
-            super::neurons::OUTPUT_NEURON_REGISTER[*neuron](self, world);
+    pub fn react(&mut self, world: &mut super::World, output: &Vec<Option<f64>>){
+        for (i, neuron) in output.iter().enumerate(){
+            if let Some(neuron) = neuron{
+                // todo compute the "neuron" value (maybe for cluster) or give value to the output function
+                super::neurons::OUTPUT_NEURON_REGISTER[i](self, world);
+            }
         }
     }
 

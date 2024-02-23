@@ -1,4 +1,4 @@
-to many clusters
+// todo compute the "neuron" value (maybe for cluster) or give value to the output function
 
 create fn neurons_to_compute in objects.rs
 
@@ -16,10 +16,5 @@ add food
 add unlimited generation time
 
 
-Ask server request and data transmittion
 Ask nearest_neuron
 
-
-Cluster:
-// delete cluster ready vec
-replace with vec in update cluster fn whitch searches for already alive bots

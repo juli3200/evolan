@@ -150,7 +150,7 @@ impl World{
         .collect::<Vec<_>>();
 
         // pass to calculate.rs
-        let mut output: Vec<Vec<usize>>  = vec![];
+        let mut output: Vec<Vec<Option<f64>>>  = vec![];
         if !self.settings_.gpu{
             // returns a vec of vec(bot) of output neurons
             output = input_neurons.par_iter().
