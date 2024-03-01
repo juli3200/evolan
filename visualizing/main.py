@@ -22,7 +22,7 @@ class Visual:
 
     def jump(self, generation):
         if self.cache[generation - 1] is None:
-            with open(rf'{self.path}\{generation}.json', 'r') as file:
+            with open(rf'{self.path}/{generation}.json', 'r') as file:
                 data = json.load(file)
 
             new_data = [[[0 for _ in range(self.dim[0])] for _ in range(self.dim[1])] for _ in range(len(data))]

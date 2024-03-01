@@ -1,4 +1,4 @@
-use std::cell::Ref;
+use std::{cell::Ref, clone};
 use super::*;
 
 
@@ -144,8 +144,12 @@ impl World{
         // the function bot.neurons_to_compute is called
         // this returns a Vec of vecs(one per bot) of vecs(one per necessary gene)
         // the neurons are sorted per layer
-        let input_neurons: Vec<Vec<Vec<[f64; 5]>>> = self.bot_vec.par_iter()// the process is computed in parallel with .par_iter() method
-        .map(|bot: &objects::Bot| bot.calculate_input(/*make &self immutable*/&*self))
+
+        // non cluster bots are separated from cluster bots
+        let mut not_cluster_bots: Vec<Bot> = self.bot_vec.iter().filter(|bot| bot.cluster.is_none()).cloned().collect();
+        
+        let input_neurons: Vec<Vec<Vec<[f64; 5]>>> = not_cluster_bots.par_iter()// the process is computed in parallel with .par_iter() method
+        .map(|bot| bot.calculate_input(&*self))
         // collect the outputs of all bots in a Vec<Vec<[f64; 2]>>
         .collect::<Vec<_>>();
 
@@ -158,18 +162,23 @@ impl World{
             
         }
         
-        //  pass to bot.react(vec<usize>)
-        // copy bot vec
-        let mut bot_vec_copy = self.bot_vec.clone();
-
+        //  pass to bot.react
         // edit bot vec
-        for (index, bot) in bot_vec_copy.iter_mut().enumerate() {
+        for (index, bot) in not_cluster_bots.iter_mut().enumerate() {
             bot.react(self, &output[index]);
         }
 
-        // replace bot vec with edited vec
+        for bot in not_cluster_bots.iter(){
+            let index = find_bot(self, bot.id).unwrap();
+            self.bot_vec[index] = bot.clone();
+        }
 
-        self.bot_vec = bot_vec_copy;
+
+        ///
+        /// cluster bots reaction!!!!!!!
+        ///
+        ///
+
         self.age_of_gen += 1;
 
         // update clusters
@@ -320,14 +329,10 @@ impl World{
                         // 2. neighbour is not already in the neighbours vec
                         // 3. neighbour is not already in a cluster
                         // if all conditions are met, add the id to the neighbours vec
-                        if world.generation == 30 && world.age_of_gen == 20{
-                            println!("{}", *bot)
-                        }
+                        
                         if let Some(neighbour_bot) =  find_bot(world, neighbour){
                             let neighbour_bot: &Bot = &world.bot_vec[neighbour_bot];
-                            if world.generation == 30 && world.age_of_gen == 20{
-                                println!("{}", *neighbour_bot)
-                            }
+                            
                             if neighbour_bot.build_cluster && !neighbours.contains(&neighbour) && neighbour_bot.cluster.is_none() {
                                 neighbours.push(neighbour);
                                 // search for neighbours of the neighbour with recursion

@@ -1,4 +1,4 @@
-// todo compute the "neuron" value (maybe for cluster) or give value to the output function
+ability for bots to join clusters
 
 create fn neurons_to_compute in objects.rs
 
